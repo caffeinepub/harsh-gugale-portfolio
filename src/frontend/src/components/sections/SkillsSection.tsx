@@ -1,32 +1,29 @@
 import { Code2, Cpu, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-const coreElectronics = [
-  { name: "Embedded C", level: 90 },
-  { name: "STM32 / ARM Cortex", level: 85 },
-  { name: "ESP32", level: 88 },
-  { name: "Arduino", level: 92 },
-  { name: "CAN Protocol", level: 82 },
-  { name: "UART / SPI / I2C", level: 87 },
-  { name: "RTOS Basics", level: 75 },
-  { name: "PCB Fundamentals", level: 72 },
+const embeddedSystems = [
+  { name: "Microcontrollers (STM32 / ESP32 / Arduino)", level: 90 },
+  { name: "Firmware Development (Embedded C)", level: 88 },
+  { name: "Communication Protocols (UART / I2C / SPI / CAN)", level: 85 },
+  { name: "RTOS & Real-Time Systems", level: 78 },
+  { name: "ADC / DAC / PWM / Timers", level: 80 },
+  { name: "PCB Design Fundamentals", level: 72 },
 ];
 
-const softwareTools = [
-  { name: "Python", level: 80 },
+const aiSoftware = [
+  { name: "Python", level: 82 },
+  { name: "Machine Learning / Edge AI", level: 78 },
+  { name: "Data Processing & Visualization", level: 74 },
   { name: "MATLAB", level: 75 },
-  { name: "Git", level: 85 },
-  { name: "Proteus", level: 78 },
-  { name: "Keil uVision", level: 80 },
+  { name: "Computer Vision (OpenCV)", level: 72 },
 ];
 
-const emergingTech = [
-  "Edge AI",
-  "IoT Systems",
-  "Autonomous Systems",
-  "EV Electrical Architecture",
-  "Machine Learning",
-  "Computer Vision",
+const toolsPlatforms = [
+  { name: "Git & Version Control", level: 88 },
+  { name: "VS Code / Keil uVision", level: 85 },
+  { name: "Proteus Simulation", level: 80 },
+  { name: "KiCad (PCB)", level: 70 },
+  { name: "MATLAB / Simulink", level: 75 },
 ];
 
 export default function SkillsSection() {
@@ -90,9 +87,9 @@ export default function SkillsSection() {
 
         {/* Three-column grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Card 1: Core Electronics */}
+          {/* Card 1: Embedded Systems */}
           <div
-            data-ocid="skills.core_electronics_card"
+            data-ocid="skills.embedded_systems_card"
             className="glass-card rounded-lg p-6 relative overflow-hidden"
           >
             {/* Colored top border */}
@@ -118,19 +115,19 @@ export default function SkillsSection() {
                   className="font-mono-code text-xs"
                   style={{ color: "rgba(0,212,255,0.45)" }}
                 >
-                  MODULE_01
+                  MODULE_01 / Embedded Systems
                 </p>
                 <h3
                   className="font-display font-bold text-sm"
                   style={{ color: "#00d4ff" }}
                 >
-                  Core Electronics
+                  Embedded Systems
                 </h3>
               </div>
             </div>
 
             <div className="space-y-4">
-              {coreElectronics.map((skill) => (
+              {embeddedSystems.map((skill) => (
                 <SkillBar
                   key={skill.name}
                   name={skill.name}
@@ -142,9 +139,9 @@ export default function SkillsSection() {
             </div>
           </div>
 
-          {/* Card 2: Software & Tools */}
+          {/* Card 2: AI & Software */}
           <div
-            data-ocid="skills.software_tools_card"
+            data-ocid="skills.ai_software_card"
             className="glass-card-purple rounded-lg p-6 relative overflow-hidden"
           >
             <div
@@ -169,19 +166,19 @@ export default function SkillsSection() {
                   className="font-mono-code text-xs"
                   style={{ color: "rgba(123,47,255,0.5)" }}
                 >
-                  MODULE_02
+                  MODULE_02 / AI & Software
                 </p>
                 <h3
                   className="font-display font-bold text-sm"
                   style={{ color: "#a855f7" }}
                 >
-                  Software & Tools
+                  AI & Software
                 </h3>
               </div>
             </div>
 
             <div className="space-y-4">
-              {softwareTools.map((skill) => (
+              {aiSoftware.map((skill) => (
                 <SkillBar
                   key={skill.name}
                   name={skill.name}
@@ -193,9 +190,9 @@ export default function SkillsSection() {
             </div>
           </div>
 
-          {/* Card 3: Emerging Technologies */}
+          {/* Card 3: Tools & Platforms */}
           <div
-            data-ocid="skills.emerging_tech_card"
+            data-ocid="skills.tools_platforms_card"
             className="glass-card-green rounded-lg p-6 relative overflow-hidden md:col-span-2 lg:col-span-1"
           >
             <div
@@ -220,85 +217,27 @@ export default function SkillsSection() {
                   className="font-mono-code text-xs"
                   style={{ color: "rgba(0,255,136,0.45)" }}
                 >
-                  MODULE_03
+                  MODULE_03 / Tools & Platforms
                 </p>
                 <h3
                   className="font-display font-bold text-sm"
                   style={{ color: "#00ff88" }}
                 >
-                  Emerging Technologies
+                  Tools & Platforms
                 </h3>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              {emergingTech.map((tech) => (
-                <span
-                  key={tech}
-                  className="font-body text-sm px-3 py-2 rounded-full"
-                  style={{
-                    background: "rgba(0,255,136,0.07)",
-                    border: "1px solid rgba(0,255,136,0.25)",
-                    color: "#00ff88",
-                    boxShadow: "0 0 8px rgba(0,255,136,0.08)",
-                  }}
-                >
-                  {tech}
-                </span>
+            <div className="space-y-4">
+              {toolsPlatforms.map((skill) => (
+                <SkillBar
+                  key={skill.name}
+                  name={skill.name}
+                  level={skill.level}
+                  color="#00ff88"
+                  animate={isVisible}
+                />
               ))}
-            </div>
-
-            {/* Dashboard decorative */}
-            <div
-              className="mt-8 p-4 rounded"
-              style={{
-                background: "rgba(0,255,136,0.03)",
-                border: "1px solid rgba(0,255,136,0.1)",
-              }}
-            >
-              <p
-                className="font-mono-code text-xs mb-2"
-                style={{ color: "rgba(0,255,136,0.4)" }}
-              >
-                SYSTEM_STATUS::
-              </p>
-              <div className="space-y-2">
-                {[
-                  { label: "Edge Processing", pct: 85 },
-                  { label: "AI Integration", pct: 78 },
-                  { label: "Autonomous Logic", pct: 72 },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-3">
-                    <span
-                      className="font-body text-xs flex-1"
-                      style={{ color: "rgba(0,255,136,0.6)" }}
-                    >
-                      {item.label}
-                    </span>
-                    <div
-                      className="flex-1 h-1 rounded-full overflow-hidden"
-                      style={{ background: "rgba(0,255,136,0.1)" }}
-                    >
-                      <div
-                        className="h-full rounded-full transition-all duration-1000"
-                        style={{
-                          width: isVisible ? `${item.pct}%` : "0%",
-                          background:
-                            "linear-gradient(90deg, #00ff88, rgba(0,255,136,0.5))",
-                          boxShadow: "0 0 4px rgba(0,255,136,0.4)",
-                          transitionDelay: "0.5s",
-                        }}
-                      />
-                    </div>
-                    <span
-                      className="font-mono-code text-xs"
-                      style={{ color: "rgba(0,255,136,0.5)" }}
-                    >
-                      {item.pct}%
-                    </span>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>

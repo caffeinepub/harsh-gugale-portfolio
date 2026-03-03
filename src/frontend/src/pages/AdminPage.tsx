@@ -54,9 +54,10 @@ type ProjectFormState = {
 
 const BLOG_CATEGORIES = [
   "Embedded Systems",
+  "AI & Edge Computing",
+  "Career & GATE Journey",
+  "Creative Projects",
   "CAN Protocol",
-  "AI in Electronics",
-  "GATE Preparation",
 ];
 
 // ── Shared input styles ────────────────────────────────────────────────

@@ -1,13 +1,17 @@
 import { ChevronDown } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { SiGithub, SiInstagram, SiLinkedin } from "react-icons/si";
+import { useGetResumeContent } from "../../hooks/useQueries";
+import { trackResumeDownload } from "../../utils/analytics";
 
 export default function HeroSection() {
+  const { data: resumeContent } = useGetResumeContent();
+  const resumeUrl =
+    resumeContent?.resumeFileUrl && resumeContent.resumeFileUrl !== ""
+      ? resumeContent.resumeFileUrl
+      : "#";
+
   const handleViewProjects = () => {
     document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handleContact = () => {
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -108,8 +112,8 @@ export default function HeroSection() {
             textShadow: "0 0 10px rgba(0,212,255,0.4)",
           }}
         >
-          Embedded Systems&nbsp;|&nbsp;EV Electronics&nbsp;|&nbsp;AI-Integrated
-          Hardware
+          Embedded Systems Engineer&nbsp;|&nbsp;Edge AI
+          Developer&nbsp;|&nbsp;Creative Technologist
         </p>
 
         {/* Divider line */}
@@ -130,10 +134,8 @@ export default function HeroSection() {
             color: "rgba(232,244,248,0.7)",
           }}
         >
-          Electronics and Telecommunication Engineer specializing in embedded
-          systems, automotive electronics, and AI-powered hardware platforms.
-          Focused on building intelligent, real-time, and autonomous electronic
-          systems.
+          Building intelligent hardware systems powered by AI, automation, and
+          real-world problem solving.
         </p>
 
         {/* CTA Buttons */}
@@ -146,14 +148,75 @@ export default function HeroSection() {
           >
             VIEW PROJECTS
           </button>
-          <button
-            type="button"
-            data-ocid="hero.contact_button"
-            onClick={handleContact}
-            className="glow-btn-purple px-8 py-3 rounded font-body font-medium tracking-widest text-sm"
+          <a
+            href={resumeUrl}
+            target={resumeUrl !== "#" ? "_blank" : undefined}
+            rel="noopener noreferrer"
+            data-ocid="hero.download_resume_button"
+            className="glow-btn-purple px-8 py-3 rounded font-body font-medium tracking-widest text-sm inline-flex items-center justify-center"
+            onClick={trackResumeDownload}
           >
-            CONTACT ME
-          </button>
+            DOWNLOAD RESUME
+          </a>
+        </div>
+
+        {/* Currently Working On badge */}
+        <div className="flex justify-center mt-6">
+          <div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded"
+            style={{
+              background: "rgba(0,255,136,0.04)",
+              border: "1px solid rgba(0,255,136,0.15)",
+            }}
+          >
+            <span
+              className="w-1.5 h-1.5 rounded-full blink flex-shrink-0"
+              style={{
+                backgroundColor: "#00ff88",
+                boxShadow: "0 0 5px #00ff88",
+              }}
+            />
+            <span
+              className="font-mono-code"
+              style={{
+                fontSize: "0.65rem",
+                color: "rgba(0,255,136,0.75)",
+                letterSpacing: "0.08em",
+                textShadow: "0 0 8px rgba(0,255,136,0.3)",
+              }}
+            >
+              CURRENTLY BUILDING: AI-Powered Robotic System with Mobile Vision
+              Integration
+            </span>
+          </div>
+        </div>
+
+        {/* Social icons row */}
+        <div className="flex items-center justify-center gap-8 mt-8">
+          <SocialLink
+            href="https://linkedin.com/in/harshgugale"
+            label="LinkedIn"
+            color="#00d4ff"
+            ocid="hero.linkedin_link"
+          >
+            <SiLinkedin className="w-5 h-5" />
+          </SocialLink>
+          <SocialLink
+            href="https://instagram.com/harshgugale"
+            label="Creative Work"
+            color="#a855f7"
+            ocid="hero.instagram_link"
+          >
+            <SiInstagram className="w-5 h-5" />
+          </SocialLink>
+          <SocialLink
+            href="https://github.com/harshgugale"
+            label="GitHub"
+            color="#00ff88"
+            ocid="hero.github_link"
+          >
+            <SiGithub className="w-5 h-5" />
+          </SocialLink>
         </div>
       </div>
 
@@ -180,6 +243,48 @@ export default function HeroSection() {
         />
       </button>
     </section>
+  );
+}
+
+function SocialLink({
+  href,
+  label,
+  color,
+  ocid,
+  children,
+}: {
+  href: string;
+  label: string;
+  color: string;
+  ocid: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-ocid={ocid}
+      className="flex flex-col items-center gap-1.5 group transition-all duration-200"
+      style={{ color: "rgba(232,244,248,0.45)" }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.color = color;
+        (e.currentTarget as HTMLElement).style.filter =
+          `drop-shadow(0 0 6px ${color})`;
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.color = "rgba(232,244,248,0.45)";
+        (e.currentTarget as HTMLElement).style.filter = "none";
+      }}
+    >
+      {children}
+      <span
+        className="font-mono-code"
+        style={{ fontSize: "0.6rem", letterSpacing: "0.1em" }}
+      >
+        {label}
+      </span>
+    </a>
   );
 }
 

@@ -7,8 +7,9 @@ import {
   Send,
 } from "lucide-react";
 import { useState } from "react";
-import { SiGithub, SiLinkedin } from "react-icons/si";
-import { useSubmitContact } from "../../hooks/useQueries";
+import { SiGithub, SiInstagram, SiLinkedin } from "react-icons/si";
+import { useGetResumeContent, useSubmitContact } from "../../hooks/useQueries";
+import { trackContactSubmit } from "../../utils/analytics";
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -17,11 +18,18 @@ export default function ContactSection() {
     isPending,
     isSuccess,
     isError,
+    reset: resetMutation,
   } = useSubmitContact();
+  const { data: resumeContent } = useGetResumeContent();
+
+  const email = resumeContent?.email || "harsh.gugale@example.com";
+  const linkedin = resumeContent?.linkedin || "linkedin.com/in/harshgugale";
+  const github = resumeContent?.github || "github.com/harshgugale";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) return;
+    trackContactSubmit();
     submitContact({
       name: form.name,
       email: form.email,
@@ -103,8 +111,8 @@ export default function ContactSection() {
                 className="font-body text-sm mt-2"
                 style={{ color: "rgba(232,244,248,0.55)" }}
               >
-                Open to opportunities, collaborations, and interesting
-                conversations about embedded systems and AI hardware.
+                Open to Embedded Systems, Edge AI, and Product Development
+                Opportunities. Let's build intelligent systems together.
               </p>
             </div>
 
@@ -112,23 +120,32 @@ export default function ContactSection() {
               <ContactLink
                 icon={<Mail className="w-4 h-4" />}
                 label="EMAIL"
-                value="harsh.gugale@example.com"
-                href="mailto:harsh.gugale@example.com"
+                value={email}
+                href={`mailto:${email}`}
                 color="#00d4ff"
               />
               <ContactLink
                 icon={<SiLinkedin className="w-4 h-4" />}
                 label="LINKEDIN"
-                value="linkedin.com/in/harshgugale"
-                href="https://linkedin.com/in/harshgugale"
+                value={linkedin}
+                href={
+                  linkedin.startsWith("http") ? linkedin : `https://${linkedin}`
+                }
                 color="#a855f7"
               />
               <ContactLink
                 icon={<SiGithub className="w-4 h-4" />}
                 label="GITHUB"
-                value="github.com/harshgugale"
-                href="https://github.com/harshgugale"
+                value={github}
+                href={github.startsWith("http") ? github : `https://${github}`}
                 color="#00ff88"
+              />
+              <ContactLink
+                icon={<SiInstagram className="w-4 h-4" />}
+                label="INSTAGRAM"
+                value="instagram.com/harshgugale"
+                href="https://instagram.com/harshgugale"
+                color="#a855f7"
               />
             </div>
 
@@ -191,7 +208,10 @@ export default function ContactSection() {
                 </p>
                 <button
                   type="button"
-                  onClick={() => setForm({ name: "", email: "", message: "" })}
+                  onClick={() => {
+                    setForm({ name: "", email: "", message: "" });
+                    resetMutation();
+                  }}
                   className="mt-6 glow-btn-cyan px-6 py-2 rounded font-body text-sm"
                 >
                   SEND ANOTHER

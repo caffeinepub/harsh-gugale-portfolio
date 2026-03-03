@@ -10,13 +10,15 @@ import {
 import { useState } from "react";
 import type { BlogPost } from "../backend.d";
 import { useGetAllPosts, useGetFeaturedPost } from "../hooks/useQueries";
+import { trackBlogClick } from "../utils/analytics";
 
 type BlogCategory =
   | "All"
   | "Embedded Systems"
-  | "CAN Protocol"
-  | "AI in Electronics"
-  | "GATE Preparation";
+  | "AI & Edge Computing"
+  | "Career & GATE Journey"
+  | "Creative Projects"
+  | "CAN Protocol";
 
 // Fallback posts for when backend returns nothing
 const fallbackPosts: BlogPost[] = [
@@ -58,7 +60,7 @@ const fallbackPosts: BlogPost[] = [
     publishedAt:
       BigInt(Date.now() - 21 * 24 * 60 * 60 * 1000) * BigInt(1_000_000),
     isFeatured: false,
-    category: "AI in Electronics",
+    category: "AI & Edge Computing",
     fileUrl: "",
   },
   {
@@ -84,7 +86,7 @@ const fallbackPosts: BlogPost[] = [
     publishedAt:
       BigInt(Date.now() - 35 * 24 * 60 * 60 * 1000) * BigInt(1_000_000),
     isFeatured: false,
-    category: "GATE Preparation",
+    category: "Career & GATE Journey",
     fileUrl: "",
   },
   {
@@ -106,9 +108,10 @@ const fallbackPosts: BlogPost[] = [
 const categories: BlogCategory[] = [
   "All",
   "Embedded Systems",
+  "AI & Edge Computing",
+  "Career & GATE Journey",
+  "Creative Projects",
   "CAN Protocol",
-  "AI in Electronics",
-  "GATE Preparation",
 ];
 
 const categoryConfig: Record<
@@ -127,23 +130,29 @@ const categoryConfig: Record<
     border: "rgba(0,212,255,0.3)",
     ocid: "blog.embedded_tab",
   },
-  "CAN Protocol": {
-    color: "#a855f7",
-    bg: "rgba(168,85,247,0.1)",
-    border: "rgba(168,85,247,0.3)",
-    ocid: "blog.can_tab",
-  },
-  "AI in Electronics": {
+  "AI & Edge Computing": {
     color: "#00ff88",
     bg: "rgba(0,255,136,0.1)",
     border: "rgba(0,255,136,0.3)",
     ocid: "blog.ai_tab",
   },
-  "GATE Preparation": {
+  "Career & GATE Journey": {
     color: "#ff8800",
     bg: "rgba(255,136,0,0.1)",
     border: "rgba(255,136,0,0.3)",
     ocid: "blog.gate_tab",
+  },
+  "Creative Projects": {
+    color: "#a855f7",
+    bg: "rgba(168,85,247,0.1)",
+    border: "rgba(168,85,247,0.3)",
+    ocid: "blog.creative_tab",
+  },
+  "CAN Protocol": {
+    color: "#a855f7",
+    bg: "rgba(168,85,247,0.1)",
+    border: "rgba(168,85,247,0.3)",
+    ocid: "blog.can_tab",
   },
 };
 
@@ -343,6 +352,12 @@ export default function BlogPage() {
                         type="button"
                         className="glow-btn-cyan px-5 py-2 rounded font-body text-sm font-medium flex items-center gap-2"
                         aria-label={`Read more about ${displayFeatured.title}`}
+                        onClick={() =>
+                          trackBlogClick(
+                            displayFeatured.title,
+                            displayFeatured.category,
+                          )
+                        }
                       >
                         READ MORE
                         <ChevronRight className="w-4 h-4" />
@@ -537,6 +552,7 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
               className="flex items-center gap-1 font-body text-xs font-medium transition-colors duration-200"
               style={{ color: catCfg.color }}
               aria-label={`Read more about ${post.title}`}
+              onClick={() => trackBlogClick(post.title, post.category)}
             >
               READ MORE
               <ChevronRight className="w-3 h-3" />
