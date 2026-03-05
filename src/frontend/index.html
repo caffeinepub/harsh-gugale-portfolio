@@ -1,30 +1,79 @@
 <html lang="en" class="dark">
   <head>
-    <!-- Google tag (gtag.js) -->
+    <!-- ── Character set & viewport (must be first) ───────────────── -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ── Primary SEO meta ──────────────────────────────────────── -->
+    <title>Harsh Gugale | Embedded Systems Engineer</title>
+    <meta name="description" content="Harsh Gugale – Electronics and Telecommunication Engineer specializing in embedded systems, automotive electronics, and AI-powered hardware platforms." />
+    <meta name="keywords" content="Harsh Gugale, Embedded Systems, EV Electronics, CAN Protocol, STM32, ESP32, Arduino, DRDO, Portfolio" />
+    <meta name="author" content="Harsh Gugale" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#060B18" />
+
+    <!-- ── Open Graph ─────────────────────────────────────────────── -->
+    <meta property="og:title" content="Harsh Gugale | Embedded Systems Engineer" />
+    <meta property="og:description" content="Electronics and Telecommunication Engineer specializing in embedded systems, automotive electronics, and AI-powered hardware platforms." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- ── Twitter Card ───────────────────────────────────────────── -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Harsh Gugale | Embedded Systems Engineer" />
+    <meta name="twitter:description" content="Electronics and Telecommunication Engineer specializing in embedded systems, automotive electronics, and AI-powered hardware platforms." />
+
+    <!-- ── Favicon (inline SVG — zero extra request) ─────────────── -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%23060b18'/><rect width='100' height='100' rx='12' fill='none' stroke='%2300d4ff' stroke-width='4'/><text x='50' y='67' font-family='monospace' font-size='42' font-weight='bold' fill='%2300d4ff' text-anchor='middle'>HG</text></svg>" />
+
+    <!-- ── Resource hints ─────────────────────────────────────────── -->
+    <!-- Preconnect to GA (reduces connection latency for analytics) -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+    <!-- ── Security meta headers ──────────────────────────────────── -->
+    <!-- Prevent clickjacking -->
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+    <!-- Prevent MIME sniffing -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <!-- Enforce HTTPS for 1 year -->
+    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains" />
+    <!-- Cross-Origin Opener Policy -->
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups" />
+    <!-- Referrer policy -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- ── Google Analytics 4 (async — non-blocking) ─────────────── -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4CQ8LN5Q5M"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-4CQ8LN5Q5M');
+      gtag('config', 'G-4CQ8LN5Q5M', { send_page_view: true });
     </script>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Harsh Gugale | Embedded Systems Engineer</title>
-    <meta name="description" content="Harsh Gugale – Electronics and Telecommunication Engineer specializing in embedded systems, automotive electronics, and AI-powered hardware platforms." />
-    <meta name="keywords" content="Harsh Gugale, Embedded Systems, EV Electronics, CAN Protocol, STM32, ESP32, Arduino, DRDO, Portfolio" />
-    <meta name="author" content="Harsh Gugale" />
-    <meta property="og:title" content="Harsh Gugale | Embedded Systems Engineer" />
-    <meta property="og:description" content="Electronics and Telecommunication Engineer specializing in embedded systems, automotive electronics, and AI-powered hardware platforms." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Harsh Gugale | Embedded Systems Engineer" />
-    <meta name="twitter:description" content="Electronics and Telecommunication Engineer specializing in embedded systems, automotive electronics, and AI-powered hardware platforms." />
-    <meta name="theme-color" content="#060B18" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%23060b18'/><rect width='100' height='100' rx='12' fill='none' stroke='%2300d4ff' stroke-width='4'/><text x='50' y='67' font-family='monospace' font-size='42' font-weight='bold' fill='%2300d4ff' text-anchor='middle'>HG</text></svg>" />
+
+    <!-- ── Structured data (JSON-LD) ──────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Harsh Gugale",
+      "jobTitle": "Embedded Systems Engineer",
+      "description": "Electronics and Telecommunication Engineer specializing in embedded systems, automotive electronics, and AI-powered hardware platforms.",
+      "url": "https://harshgugale.com",
+      "sameAs": [
+        "https://linkedin.com/in/harshgugale",
+        "https://github.com/harshgugale",
+        "https://instagram.com/harshgugale"
+      ],
+      "knowsAbout": ["Embedded Systems", "CAN Protocol", "STM32", "ESP32", "Edge AI", "EV Electronics"]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <!-- Module script — browser treats as deferred automatically -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

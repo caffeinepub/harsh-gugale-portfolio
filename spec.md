@@ -1,34 +1,46 @@
-# Harsh Gugale – Embedded Systems Portfolio
+# Harsh Gugale Portfolio
 
 ## Current State
-New project. No existing code.
+- Full portfolio with backend (Motoko) + React frontend
+- Admin panel at `/admin` (password: `harsh2025`) with Resume, Blog, Projects tabs
+- Backend stores: ContactSubmission, BlogPost, Project, ResumeContent
+- Experience, About bio paragraphs, Skills, Profile Image are ALL hardcoded in frontend components — not editable
+- Admin panel has NO contact messages viewer
+- Admin panel has NO password reset mechanism
+- Admin panel missing tabs for: Experience, About content, Skills, Profile Image
 
 ## Requested Changes (Diff)
 
 ### Add
-- Multi-page portfolio website with React Router (Home, Media, Blog pages)
-- Landing/Hero section with animated background, headline, tagline, intro, and two CTA buttons
-- About section with glassmorphism card layout describing EV internship, DRDO internship, microcontroller experience, and career objective
-- Skills section with categorized glowing cards and animated progress indicators (Core Electronics, Software & Tools, Emerging Technologies)
-- Experience section with vertical neon timeline layout representing internship mission logs
-- Projects section with grid layout, hover animations, glow borders, and project cards (title, tech stack, description, View Details button)
-- Photography & Vlogging page (Media Vault): dark gallery with categories (Travel Photography, Cinematic Reels, Drone Shots, Short Vlogs), hover zoom, glass overlay captions
-- Electronics Blog page: featured article, category filters (Embedded Systems, CAN Protocol, AI in Electronics, GATE Preparation), card layout with Read More buttons
-- Contact section with futuristic form (Name, Email, Message), glowing Send button, and social links (Email, LinkedIn, GitHub)
-- Backend: contact form submission storage, blog posts storage, project listings storage
+- Backend: `ExperienceEntry` type with id, title, company, badge, date, description, tags (array), accent (cyan/purple)
+- Backend: `AboutContent` type — bio paragraphs (array of {prefix, text}), protocols (array), status rows (array of {label, value, color})
+- Backend: `SkillCategory` type with name and skills array
+- Backend: `SiteSettings` type — profileImageUrl, instagram, currentlyBuilding, adminPasswordHash
+- Backend: CRUD methods for ExperienceEntry, AboutContent (singleton update), SkillCategory CRUD, SiteSettings update
+- Backend: `getAllContacts` is already present, just needs admin panel UI
+- Backend: `verifyAdminPassword`, `changeAdminPassword` methods
+- Frontend: Admin tabs for "Experience", "About & Skills", "Profile Image", "Messages", "Settings (Password)"
+- Frontend: AboutSection, ExperienceSection, SkillsSection, HeroSection read from backend (with fallback defaults)
+- Frontend: Password reset using a recovery code stored in SiteSettings (admin sets a recovery email/code)
 
 ### Modify
-- Nothing (new project)
+- Backend main.mo: add Experience, About, Skills, SiteSettings actors/storage
+- backend.d.ts: add all new types and methods
+- useQueries.ts: add hooks for new backend calls
+- AboutSection.tsx: read about content from backend
+- ExperienceSection.tsx: read experiences from backend
+- HeroSection.tsx: read profileImageUrl, instagram, currentlyBuilding from backend
+- AdminPage.tsx: add 5 new tabs (Experience, About & Skills, Profile Image, Messages, Password)
+- AdminDashboard: expand tabs list
 
 ### Remove
-- Nothing (new project)
+- Hardcoded `experiences` array in ExperienceSection.tsx
+- Hardcoded about paragraphs/protocols in AboutSection.tsx
 
 ## Implementation Plan
-1. Generate Motoko backend with actors for: contact form submissions, blog posts (with categories), and project listings
-2. Build React frontend with React Router for multi-page navigation (Home, Media, Blog)
-3. Home page: animated circuit/particle background, Hero, About, Skills, Experience, Projects, Contact sections in scroll layout
-4. Media page: category-filtered gallery grid with mock cinematic media items
-5. Blog page: featured article, category filters, article card grid
-6. Apply futuristic design system: deep navy/black background, neon blue/cyan/purple accents, Orbitron font, glassmorphism cards, neon glow borders, subtle animations
-7. Responsive layout for desktop and mobile
-8. SEO meta tags in index.html
+1. Rewrite backend/main.mo to add Experience, AboutContent, SkillCategory, SiteSettings with full CRUD
+2. Update backend.d.ts with all new types and method signatures
+3. Update useQueries.ts with new hooks
+4. Refactor AboutSection, ExperienceSection, HeroSection to read from backend with sensible defaults
+5. Expand AdminPage with 5 new tabs covering all editable content
+6. Password reset: admin can change password from Settings tab by entering old password OR a recovery PIN they set

@@ -8,12 +8,34 @@ import {
   createRouter,
   useNavigate,
 } from "@tanstack/react-router";
+import { Suspense, lazy } from "react";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
-import AdminPage from "./pages/AdminPage";
-import BlogPage from "./pages/BlogPage";
+// HomePage is above-the-fold — load eagerly
 import HomePage from "./pages/HomePage";
-import MediaPage from "./pages/MediaPage";
+// Non-critical routes: code-split and lazy-loaded
+const BlogPage = lazy(() => import("./pages/BlogPage"));
+const MediaPage = lazy(() => import("./pages/MediaPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+
+// Minimal fallback shown while a lazy page chunk loads
+function PageLoader() {
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{ backgroundColor: "#060b18" }}
+    >
+      <div
+        className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
+        style={{
+          borderColor: "rgba(0,212,255,0.6)",
+          borderTopColor: "transparent",
+        }}
+        aria-label="Loading page"
+      />
+    </div>
+  );
+}
 
 // Layout component wrapping all pages
 function RootLayout() {
@@ -24,7 +46,9 @@ function RootLayout() {
     >
       <Navbar />
       <main>
-        <Outlet />
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
       <Toaster theme="dark" />

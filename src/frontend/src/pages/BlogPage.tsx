@@ -7,9 +7,13 @@ import {
   Paperclip,
   User,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { BlogPost } from "../backend.d";
-import { useGetAllPosts, useGetFeaturedPost } from "../hooks/useQueries";
+import {
+  useGetAllPosts,
+  useGetFeaturedPost,
+  useInitializeBlogs,
+} from "../hooks/useQueries";
 import { trackBlogClick } from "../utils/analytics";
 
 type BlogCategory =
@@ -18,89 +22,215 @@ type BlogCategory =
   | "AI & Edge Computing"
   | "Career & GATE Journey"
   | "Creative Projects"
-  | "CAN Protocol";
+  | "CAN Protocol"
+  | "RTOS & Firmware";
 
 // Fallback posts for when backend returns nothing
 const fallbackPosts: BlogPost[] = [
   {
     id: BigInt(1),
-    title: "Getting Started with CAN Protocol in Automotive Systems",
+    title: "Building a Bluetooth-Based Smart Lock Using ESP32",
     summary:
-      "A deep dive into Controller Area Network (CAN) protocol — how it works, why it's essential for automotive ECUs, and implementation on STM32.",
-    content:
-      "CAN Protocol is fundamental to automotive embedded systems. This post covers the basics and advanced usage patterns.",
+      "Design and implementation of a Bluetooth-enabled smart lock using ESP32 with auto-lock functionality and embedded firmware logic. Covers Bluetooth event handling, servo actuation, timer-based state machine, and fail-safe conditions.",
+    content: `Introduction
+
+Security systems are rapidly evolving from mechanical locks to intelligent digital solutions. In this project, I developed a Bluetooth-based smart lock system using ESP32 to enable secure, wireless access control.
+
+The objective was to design a reliable embedded system capable of handling authentication, actuation, and state control efficiently.
+
+Problem Statement
+
+Traditional locks lack digital monitoring, remote control capability, and automation. The challenge was to build a cost-effective embedded lock system that:
+- Authenticates users via Bluetooth
+- Controls a servo-based locking mechanism
+- Automatically relocks after a predefined time
+
+System Architecture
+
+Microcontroller: ESP32
+Communication: Bluetooth Serial
+Actuator: Servo Motor
+Interface: Mobile Application
+
+Workflow:
+1. User connects via Bluetooth
+2. Authentication command is transmitted
+3. ESP32 validates input
+4. Servo rotates to unlock
+5. Auto-lock timer resets system
+
+Technical Implementation
+
+- Bluetooth event handling
+- Command parsing logic
+- Timer-based state machine
+- Fail-safe conditions
+
+Power stability and servo control precision were carefully optimized to ensure smooth operation.
+
+Challenges
+
+- Bluetooth reconnection logic
+- Servo jitter due to voltage fluctuation
+- Preventing unauthorized command execution
+
+These were solved using structured firmware design and input validation mechanisms.
+
+Results
+
+- Unlock response time: < 1 second
+- Auto-lock feature: Configurable delay
+- Stable performance under continuous operation
+
+Key Learning
+
+This project strengthened my skills in embedded firmware architecture, real-time event handling, hardware-software integration, and IoT-based system design.`,
     author: "Harsh Gugale",
     publishedAt:
       BigInt(Date.now() - 7 * 24 * 60 * 60 * 1000) * BigInt(1_000_000),
     isFeatured: true,
-    category: "CAN Protocol",
-    fileUrl: "",
-  },
-  {
-    id: BigInt(2),
-    title: "STM32 vs ESP32: Choosing the Right MCU for Your Project",
-    summary:
-      "A practical comparison of STM32 and ESP32 microcontrollers — performance, peripherals, power consumption, and ideal use cases for each platform.",
-    content: "Comparing popular microcontrollers for embedded projects.",
-    author: "Harsh Gugale",
-    publishedAt:
-      BigInt(Date.now() - 14 * 24 * 60 * 60 * 1000) * BigInt(1_000_000),
-    isFeatured: false,
     category: "Embedded Systems",
     fileUrl: "",
   },
   {
-    id: BigInt(3),
-    title: "Edge AI on Microcontrollers: TensorFlow Lite Micro Guide",
+    id: BigInt(2),
+    title: "Edge AI-Based Traffic Violation Detection Using ESP32-CAM",
     summary:
-      "How to run machine learning models on resource-constrained embedded hardware using TensorFlow Lite Micro, with practical examples on Raspberry Pi.",
-    content:
-      "Edge AI deployment on microcontrollers is transforming embedded systems.",
+      "Implementation of a lightweight object detection model on ESP32-CAM for real-time traffic violation monitoring using edge computing. Achieves ~400ms detection latency with no cloud dependency.",
+    content: `Introduction
+
+With increasing traffic density, intelligent monitoring systems are essential. This project focuses on deploying a lightweight AI model directly on ESP32-CAM to detect traffic violations in real time.
+
+Problem Statement
+
+Cloud-dependent systems introduce latency and bandwidth dependency. The objective was to:
+- Perform on-device inference
+- Reduce processing delay
+- Maintain acceptable detection accuracy
+
+System Architecture
+
+Hardware: ESP32-CAM
+AI Model: Optimized lightweight object detection
+Processing: On-device inference
+Output: Alert trigger mechanism
+
+Technical Approach
+
+1. Capture image frames
+2. Preprocess input
+3. Run inference model
+4. Classify object
+5. Trigger event if violation detected
+
+Optimization Strategy
+
+- Reduced image resolution
+- Model quantization
+- Frame skipping logic
+- Efficient memory allocation
+
+Results
+
+- Detection latency: ~400 ms
+- No cloud dependency
+- Edge-based privacy preservation
+
+Key Learning
+
+This project enhanced edge AI deployment capability, embedded optimization skills, and AI and firmware integration knowledge.`,
     author: "Harsh Gugale",
     publishedAt:
-      BigInt(Date.now() - 21 * 24 * 60 * 60 * 1000) * BigInt(1_000_000),
+      BigInt(Date.now() - 14 * 24 * 60 * 60 * 1000) * BigInt(1_000_000),
     isFeatured: false,
     category: "AI & Edge Computing",
     fileUrl: "",
   },
   {
-    id: BigInt(4),
-    title: "RTOS Fundamentals for Embedded Engineers",
+    id: BigInt(3),
+    title: "Understanding RTOS for Real-Time Embedded Systems",
     summary:
-      "Understanding Real-Time Operating Systems (RTOS) — task scheduling, semaphores, mutexes, and when to use FreeRTOS in your embedded projects.",
-    content: "RTOS concepts are essential for complex embedded applications.",
+      "Explanation of Real-Time Operating Systems and their importance in deterministic embedded system applications. Covers task scheduling, priority preemption, context switching, and inter-task communication.",
+    content: `Introduction
+
+As embedded systems scale in complexity, task management becomes critical. RTOS enables predictable task execution and deterministic system behavior.
+
+What is RTOS?
+
+A Real-Time Operating System ensures high-priority tasks meet strict timing deadlines. It focuses on determinism rather than throughput.
+
+Core Concepts
+
+- Task scheduling
+- Priority preemption
+- Context switching
+- Inter-task communication
+- Mutex and semaphores
+
+Practical Example
+
+In robotics:
+- Task 1: Sensor reading
+- Task 2: Motor control
+- Task 3: Communication
+
+RTOS prioritizes motor control over background logging tasks.
+
+Importance
+
+RTOS improves:
+- Reliability
+- Scalability
+- Structured firmware development
+
+Key Learning
+
+Understanding RTOS is fundamental for advanced embedded and real-time systems engineering.`,
+    author: "Harsh Gugale",
+    publishedAt:
+      BigInt(Date.now() - 21 * 24 * 60 * 60 * 1000) * BigInt(1_000_000),
+    isFeatured: false,
+    category: "RTOS & Firmware",
+    fileUrl: "",
+  },
+  {
+    id: BigInt(4),
+    title: "My Structured GATE Preparation Strategy as an ECE Student",
+    summary:
+      "A strategic and structured preparation roadmap for GATE Electronics focusing on conceptual clarity and problem-solving efficiency. Covers subject priority, study framework, and key insights.",
+    content: `Introduction
+
+Preparing for GATE requires structured planning and conceptual depth. My preparation focused on building fundamentals first and then strengthening problem-solving speed.
+
+Study Framework
+
+- Strong mathematical foundation
+- Core subject mastery
+- Previous year question analysis
+- Weekly mock evaluation
+
+Subject Priority
+
+1. Signals and Systems
+2. Control Systems
+3. Network Theory
+4. Digital Electronics
+5. Microprocessors
+
+Key Insight
+
+GATE tests analytical thinking rather than memorization.
+
+Outcome
+
+- Improved conceptual clarity
+- Stronger embedded system foundation
+- Better problem-solving efficiency`,
     author: "Harsh Gugale",
     publishedAt:
       BigInt(Date.now() - 28 * 24 * 60 * 60 * 1000) * BigInt(1_000_000),
     isFeatured: false,
-    category: "Embedded Systems",
-    fileUrl: "",
-  },
-  {
-    id: BigInt(5),
-    title: "GATE ECE 2025: Signals & Systems Preparation Strategy",
-    summary:
-      "Complete preparation roadmap for GATE Electronics — focusing on Signals & Systems, weighted topics, important formulae, and past paper analysis.",
-    content: "Comprehensive GATE preparation guidance for ECE students.",
-    author: "Harsh Gugale",
-    publishedAt:
-      BigInt(Date.now() - 35 * 24 * 60 * 60 * 1000) * BigInt(1_000_000),
-    isFeatured: false,
     category: "Career & GATE Journey",
-    fileUrl: "",
-  },
-  {
-    id: BigInt(6),
-    title: "Designing a CAN Bus Monitor with STM32 and Python",
-    summary:
-      "Step-by-step guide to building a CAN bus monitoring tool using STM32 as the hardware interface and Python for real-time data visualization.",
-    content:
-      "Building practical CAN bus monitoring tools for automotive diagnostics.",
-    author: "Harsh Gugale",
-    publishedAt:
-      BigInt(Date.now() - 42 * 24 * 60 * 60 * 1000) * BigInt(1_000_000),
-    isFeatured: false,
-    category: "CAN Protocol",
     fileUrl: "",
   },
 ];
@@ -109,6 +239,7 @@ const categories: BlogCategory[] = [
   "All",
   "Embedded Systems",
   "AI & Edge Computing",
+  "RTOS & Firmware",
   "Career & GATE Journey",
   "Creative Projects",
   "CAN Protocol",
@@ -154,6 +285,12 @@ const categoryConfig: Record<
     border: "rgba(168,85,247,0.3)",
     ocid: "blog.can_tab",
   },
+  "RTOS & Firmware": {
+    color: "#00ff88",
+    bg: "rgba(0,255,136,0.1)",
+    border: "rgba(0,255,136,0.3)",
+    ocid: "blog.rtos_tab",
+  },
 };
 
 function formatDate(timestamp: bigint): string {
@@ -171,6 +308,14 @@ export default function BlogPage() {
   const { data: allPosts, isLoading: postsLoading } = useGetAllPosts();
   const { data: featuredPost, isLoading: featuredLoading } =
     useGetFeaturedPost();
+  const { mutate: seedBlogs } = useInitializeBlogs();
+
+  // Auto-seed real blog posts into backend if it's empty
+  useEffect(() => {
+    if (!postsLoading && allPosts && allPosts.length === 0) {
+      seedBlogs();
+    }
+  }, [postsLoading, allPosts, seedBlogs]);
 
   const isLoading = postsLoading || featuredLoading;
 

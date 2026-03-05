@@ -263,6 +263,17 @@ export function useDeleteProject() {
   });
 }
 
+// ── Blog Initialize ───────────────────────────────────────────────────
+export function useInitializeBlogs() {
+  const { actor } = useActor();
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.initializeBlogs();
+    },
+  });
+}
+
 // ── Contact Submission ────────────────────────────────────────────────
 export function useSubmitContact() {
   const { actor } = useActor();

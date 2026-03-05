@@ -1,10 +1,9 @@
 /**
  * Google Analytics 4 — lightweight event helper.
  *
- * GA4 measurement ID is read from the build-time env variable
- * VITE_GA_MEASUREMENT_ID (e.g. G-XXXXXXXXXX).
- * If the variable is absent the helpers are silent no-ops so the
- * site works fine before an ID is configured.
+ * The gtag script is loaded in index.html <head> (G-4CQ8LN5Q5M).
+ * This module only sends custom events via the global window.gtag.
+ * It falls back silently if gtag is not yet available.
  */
 
 declare global {
@@ -12,36 +11,6 @@ declare global {
     dataLayer: unknown[];
     gtag: (...args: unknown[]) => void;
   }
-}
-
-const GA_ID = (import.meta as unknown as { env: Record<string, string> }).env
-  ?.VITE_GA_MEASUREMENT_ID;
-
-/** True once the gtag script has been injected */
-let initialized = false;
-
-/**
- * Lazily inject the gtag script on first use.
- * Called automatically by `trackEvent`; no need to call manually.
- */
-function init(): void {
-  if (initialized || !GA_ID || typeof window === "undefined") return;
-  initialized = true;
-
-  window.dataLayer = window.dataLayer || [];
-  window.gtag = (...args: unknown[]) => {
-    window.dataLayer.push(args);
-  };
-  window.gtag("js", new Date());
-  window.gtag("config", GA_ID, {
-    // Disable automatic page-view on config so we fire it manually
-    send_page_view: false,
-  });
-
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
-  document.head.appendChild(script);
 }
 
 /**
@@ -54,12 +23,12 @@ export function trackEvent(
   eventName: string,
   params?: Record<string, string | number | boolean>,
 ): void {
-  if (!GA_ID) return; // No ID configured — silent no-op
-  init();
   try {
-    window.gtag("event", eventName, params ?? {});
+    if (typeof window !== "undefined" && typeof window.gtag === "function") {
+      window.gtag("event", eventName, params ?? {});
+    }
   } catch {
-    // Never let analytics throw to the user
+    // Never let analytics errors surface to the user
   }
 }
 

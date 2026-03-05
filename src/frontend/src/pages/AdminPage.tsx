@@ -55,6 +55,7 @@ type ProjectFormState = {
 const BLOG_CATEGORIES = [
   "Embedded Systems",
   "AI & Edge Computing",
+  "RTOS & Firmware",
   "Career & GATE Journey",
   "Creative Projects",
   "CAN Protocol",

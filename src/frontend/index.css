@@ -42,6 +42,9 @@
     --glow-cyan: rgba(0, 212, 255, 0.3);
     --glow-purple: rgba(123, 47, 255, 0.3);
     --glow-green: rgba(0, 255, 136, 0.3);
+    /* Accessible muted text — minimum 4.5:1 contrast on #060b18 */
+    --text-muted: rgba(232, 244, 248, 0.72);
+    --text-faint: rgba(232, 244, 248, 0.52);
 
     --chart-1: 0.78 0.18 200;
     --chart-2: 0.55 0.22 280;
@@ -249,6 +252,9 @@
   background-size: 60px 60px;
   animation: gridPulse 5s ease-in-out infinite;
   pointer-events: none;
+  /* Promote to own compositor layer — avoids repainting parent */
+  will-change: opacity;
+  contain: strict;
 }
 
 .hero-grid-overlay {
@@ -260,6 +266,8 @@
   background-size: 180px 180px;
   animation: gridPulse 8s ease-in-out infinite reverse;
   pointer-events: none;
+  will-change: opacity;
+  contain: strict;
 }
 
 @keyframes gridPulse {
@@ -278,6 +286,8 @@
   border-radius: 50%;
   pointer-events: none;
   animation: floatParticle linear infinite;
+  /* GPU layer per particle — avoids layout thrash during animation */
+  will-change: transform, opacity;
 }
 
 @keyframes floatParticle {
@@ -336,6 +346,7 @@
   animation: scanLine 6s linear infinite;
   pointer-events: none;
   z-index: 1;
+  will-change: transform;
 }
 
 /* ── Progress bar animations ───────────────────────────────────────── */
@@ -493,6 +504,18 @@
   background: rgba(0, 212, 255, 0.5);
 }
 
+/* ── content-visibility: auto for below-fold sections ─────────────── */
+/* Defers rendering work until section is near viewport — cuts LCP   */
+#about,
+#skills,
+#experience,
+#projects,
+#contact {
+  content-visibility: auto;
+  /* Hint at approximate section height to avoid layout shifts       */
+  contain-intrinsic-size: 0 600px;
+}
+
 /* ── Responsive utilities ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -500,5 +523,17 @@
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Print: hide decorative elements ─────────────────────────────── */
+@media print {
+  .hero-grid-bg,
+  .hero-grid-overlay,
+  .scan-line,
+  .particle,
+  .node-pulse-cyan,
+  .node-pulse-purple {
+    display: none !important;
   }
 }
