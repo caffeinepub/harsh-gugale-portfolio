@@ -1,46 +1,45 @@
 # Harsh Gugale Portfolio
 
 ## Current State
-- Full portfolio with backend (Motoko) + React frontend
-- Admin panel at `/admin` (password: `harsh2025`) with Resume, Blog, Projects tabs
-- Backend stores: ContactSubmission, BlogPost, Project, ResumeContent
-- Experience, About bio paragraphs, Skills, Profile Image are ALL hardcoded in frontend components — not editable
-- Admin panel has NO contact messages viewer
-- Admin panel has NO password reset mechanism
-- Admin panel missing tabs for: Experience, About content, Skills, Profile Image
+- Full-stack portfolio with Motoko backend and React frontend
+- Admin panel at `/admin` with tabs: Resume Editor, Blog Manager, Projects Manager
+- GA4 tracking via `analytics.ts` for resume downloads, blog clicks, project clicks, contact submits
+- Backend tracks: contacts, blog posts, projects, resume content
+- No in-app analytics counters (visitor count, view counts, resume download count)
 
 ## Requested Changes (Diff)
 
 ### Add
-- Backend: `ExperienceEntry` type with id, title, company, badge, date, description, tags (array), accent (cyan/purple)
-- Backend: `AboutContent` type — bio paragraphs (array of {prefix, text}), protocols (array), status rows (array of {label, value, color})
-- Backend: `SkillCategory` type with name and skills array
-- Backend: `SiteSettings` type — profileImageUrl, instagram, currentlyBuilding, adminPasswordHash
-- Backend: CRUD methods for ExperienceEntry, AboutContent (singleton update), SkillCategory CRUD, SiteSettings update
-- Backend: `getAllContacts` is already present, just needs admin panel UI
-- Backend: `verifyAdminPassword`, `changeAdminPassword` methods
-- Frontend: Admin tabs for "Experience", "About & Skills", "Profile Image", "Messages", "Settings (Password)"
-- Frontend: AboutSection, ExperienceSection, SkillsSection, HeroSection read from backend (with fallback defaults)
-- Frontend: Password reset using a recovery code stored in SiteSettings (admin sets a recovery email/code)
+- **Analytics backend storage**: new Motoko state for tracking:
+  - `visitorCount`: incremented on each page visit (via a `recordVisit` update call)
+  - `resumeDownloadCount`: incremented when resume is downloaded
+  - `blogViewCounts`: Map<Nat, Nat> (blog post id -> view count)
+  - `projectViewCounts`: Map<Nat, Nat> (project id -> view count)
+- **Backend query methods**: `getAnalytics()` returning all stats in one call
+- **Backend update methods**: `recordVisit()`, `recordResumeDownload()`, `recordBlogView(id)`, `recordProjectView(id)`
+- **Analytics tab** in admin dashboard: new "Analytics" tab showing:
+  - Total visitor count card
+  - Resume download count card
+  - Top 5 most viewed blog posts list
+  - Top 5 most viewed projects list
+- **Frontend tracking calls**: wire `recordVisit()` in App.tsx on mount, `recordResumeDownload()` in hero CTA, `recordBlogView()` on blog card click, `recordProjectView()` on project card click
 
 ### Modify
-- Backend main.mo: add Experience, About, Skills, SiteSettings actors/storage
-- backend.d.ts: add all new types and methods
-- useQueries.ts: add hooks for new backend calls
-- AboutSection.tsx: read about content from backend
-- ExperienceSection.tsx: read experiences from backend
-- HeroSection.tsx: read profileImageUrl, instagram, currentlyBuilding from backend
-- AdminPage.tsx: add 5 new tabs (Experience, About & Skills, Profile Image, Messages, Password)
-- AdminDashboard: expand tabs list
+- `main.mo`: add analytics state variables and methods
+- `backend.d.ts`: add new analytics types and method signatures
+- `AdminPage.tsx`: add "Analytics" tab with dashboard panel
+- `useQueries.ts`: add hooks for analytics data fetch and mutations
+- `App.tsx` or `HomePage.tsx`: call `recordVisit` on mount
 
 ### Remove
-- Hardcoded `experiences` array in ExperienceSection.tsx
-- Hardcoded about paragraphs/protocols in AboutSection.tsx
+- Nothing removed
 
 ## Implementation Plan
-1. Rewrite backend/main.mo to add Experience, AboutContent, SkillCategory, SiteSettings with full CRUD
-2. Update backend.d.ts with all new types and method signatures
-3. Update useQueries.ts with new hooks
-4. Refactor AboutSection, ExperienceSection, HeroSection to read from backend with sensible defaults
-5. Expand AdminPage with 5 new tabs covering all editable content
-6. Password reset: admin can change password from Settings tab by entering old password OR a recovery PIN they set
+1. Update `main.mo` to add analytics counters (visitorCount, resumeDownloadCount, blogViewCounts, projectViewCounts), plus 4 update methods and 1 combined query `getAnalytics()`
+2. Update `backend.d.ts` with `AnalyticsData` type and new method signatures
+3. Add `useGetAnalytics`, `useRecordVisit`, `useRecordResumeDownload`, `useRecordBlogView`, `useRecordProjectView` hooks in `useQueries.ts`
+4. Wire `recordVisit` call in `App.tsx` once on mount
+5. Wire `recordResumeDownload` in hero Download Resume button
+6. Wire `recordBlogView` on blog card/read-more click in `BlogPage.tsx`
+7. Wire `recordProjectView` on project card view in `HomePage.tsx`
+8. Add "Analytics" tab to `AdminPage.tsx` with 4 stat cards and ranked lists

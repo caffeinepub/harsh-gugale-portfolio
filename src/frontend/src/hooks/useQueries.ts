@@ -1,5 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { BlogPost, Project, ResumeContent } from "../backend.d";
+import type {
+  AnalyticsData,
+  BlogPost,
+  Project,
+  ResumeContent,
+} from "../backend.d";
 import { useActor } from "./useActor";
 
 // ── Projects ──────────────────────────────────────────────────────────
@@ -259,6 +264,77 @@ export function useDeleteProject() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+
+// ── Analytics ─────────────────────────────────────────────────────────
+export function useGetAnalytics() {
+  const { actor, isFetching } = useActor();
+  return useQuery<AnalyticsData>({
+    queryKey: ["analytics"],
+    queryFn: async () => {
+      if (!actor)
+        return {
+          topBlogs: [],
+          topProjects: [],
+          visitorCount: BigInt(0),
+          resumeDownloadCount: BigInt(0),
+        };
+      return actor.getAnalytics();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useRecordVisit() {
+  const { actor } = useActor();
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) return;
+      return actor.recordVisit();
+    },
+  });
+}
+
+export function useRecordResumeDownload() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) return;
+      return actor.recordResumeDownload();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
+    },
+  });
+}
+
+export function useRecordBlogView() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: bigint) => {
+      if (!actor) return;
+      return actor.recordBlogView(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
+    },
+  });
+}
+
+export function useRecordProjectView() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: bigint) => {
+      if (!actor) return;
+      return actor.recordProjectView(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["analytics"] });
     },
   });
 }

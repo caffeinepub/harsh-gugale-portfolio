@@ -18,6 +18,22 @@ export interface BlogPost {
     category: string;
     fileUrl: string;
 }
+export interface BlogViewStat {
+    id: bigint;
+    title: string;
+    viewCount: bigint;
+}
+export interface ContactSubmission {
+    name: string;
+    email: string;
+    message: string;
+    timestamp: bigint;
+}
+export interface ProjectViewStat {
+    id: bigint;
+    title: string;
+    viewCount: bigint;
+}
 export interface Project {
     id: bigint;
     title: string;
@@ -37,11 +53,11 @@ export interface ResumeContent {
     github: string;
     resumeFileUrl: string;
 }
-export interface ContactSubmission {
-    name: string;
-    email: string;
-    message: string;
-    timestamp: bigint;
+export interface AnalyticsData {
+    topBlogs: Array<BlogViewStat>;
+    topProjects: Array<ProjectViewStat>;
+    visitorCount: bigint;
+    resumeDownloadCount: bigint;
 }
 export interface backendInterface {
     addBlogPost(title: string, category: string, summary: string, content: string, author: string, publishedAt: bigint, isFeatured: boolean, fileUrl: string): Promise<bigint>;
@@ -51,12 +67,17 @@ export interface backendInterface {
     getAllContacts(): Promise<Array<ContactSubmission>>;
     getAllPosts(): Promise<Array<BlogPost>>;
     getAllProjects(): Promise<Array<Project>>;
+    getAnalytics(): Promise<AnalyticsData>;
     getFeaturedPost(): Promise<BlogPost | null>;
     getPostsByCategory(category: string): Promise<Array<BlogPost>>;
     getResumeContent(): Promise<ResumeContent>;
     initializeBlogs(): Promise<void>;
     initializeData(): Promise<void>;
     initializeProjects(): Promise<void>;
+    recordBlogView(id: bigint): Promise<void>;
+    recordProjectView(id: bigint): Promise<void>;
+    recordResumeDownload(): Promise<void>;
+    recordVisit(): Promise<void>;
     submitContact(name: string, email: string, message: string, timestamp: bigint): Promise<void>;
     updateBlogPost(id: bigint, title: string, category: string, summary: string, content: string, author: string, publishedAt: bigint, isFeatured: boolean, fileUrl: string): Promise<boolean>;
     updateProject(id: bigint, title: string, techStack: Array<string>, description: string, category: string, githubUrl: string, demoUrl: string): Promise<boolean>;

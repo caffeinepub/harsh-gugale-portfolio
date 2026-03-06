@@ -100,6 +100,22 @@ export interface BlogPost {
     category: string;
     fileUrl: string;
 }
+export interface BlogViewStat {
+    id: bigint;
+    title: string;
+    viewCount: bigint;
+}
+export interface ContactSubmission {
+    name: string;
+    email: string;
+    message: string;
+    timestamp: bigint;
+}
+export interface ProjectViewStat {
+    id: bigint;
+    title: string;
+    viewCount: bigint;
+}
 export interface Project {
     id: bigint;
     title: string;
@@ -119,11 +135,11 @@ export interface ResumeContent {
     github: string;
     resumeFileUrl: string;
 }
-export interface ContactSubmission {
-    name: string;
-    email: string;
-    message: string;
-    timestamp: bigint;
+export interface AnalyticsData {
+    topBlogs: Array<BlogViewStat>;
+    topProjects: Array<ProjectViewStat>;
+    visitorCount: bigint;
+    resumeDownloadCount: bigint;
 }
 export interface backendInterface {
     addBlogPost(title: string, category: string, summary: string, content: string, author: string, publishedAt: bigint, isFeatured: boolean, fileUrl: string): Promise<bigint>;
@@ -133,12 +149,17 @@ export interface backendInterface {
     getAllContacts(): Promise<Array<ContactSubmission>>;
     getAllPosts(): Promise<Array<BlogPost>>;
     getAllProjects(): Promise<Array<Project>>;
+    getAnalytics(): Promise<AnalyticsData>;
     getFeaturedPost(): Promise<BlogPost | null>;
     getPostsByCategory(category: string): Promise<Array<BlogPost>>;
     getResumeContent(): Promise<ResumeContent>;
     initializeBlogs(): Promise<void>;
     initializeData(): Promise<void>;
     initializeProjects(): Promise<void>;
+    recordBlogView(id: bigint): Promise<void>;
+    recordProjectView(id: bigint): Promise<void>;
+    recordResumeDownload(): Promise<void>;
+    recordVisit(): Promise<void>;
     submitContact(name: string, email: string, message: string, timestamp: bigint): Promise<void>;
     updateBlogPost(id: bigint, title: string, category: string, summary: string, content: string, author: string, publishedAt: bigint, isFeatured: boolean, fileUrl: string): Promise<boolean>;
     updateProject(id: bigint, title: string, techStack: Array<string>, description: string, category: string, githubUrl: string, demoUrl: string): Promise<boolean>;
@@ -245,6 +266,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getAnalytics(): Promise<AnalyticsData> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAnalytics();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAnalytics();
+            return result;
+        }
+    }
     async getFeaturedPost(): Promise<BlogPost | null> {
         if (this.processError) {
             try {
@@ -326,6 +361,62 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.initializeProjects();
+            return result;
+        }
+    }
+    async recordBlogView(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.recordBlogView(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.recordBlogView(arg0);
+            return result;
+        }
+    }
+    async recordProjectView(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.recordProjectView(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.recordProjectView(arg0);
+            return result;
+        }
+    }
+    async recordResumeDownload(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.recordResumeDownload();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.recordResumeDownload();
+            return result;
+        }
+    }
+    async recordVisit(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.recordVisit();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.recordVisit();
             return result;
         }
     }

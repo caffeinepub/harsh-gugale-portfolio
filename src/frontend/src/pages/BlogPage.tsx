@@ -13,6 +13,7 @@ import {
   useGetAllPosts,
   useGetFeaturedPost,
   useInitializeBlogs,
+  useRecordBlogView,
 } from "../hooks/useQueries";
 import { trackBlogClick } from "../utils/analytics";
 
@@ -309,6 +310,7 @@ export default function BlogPage() {
   const { data: featuredPost, isLoading: featuredLoading } =
     useGetFeaturedPost();
   const { mutate: seedBlogs } = useInitializeBlogs();
+  const { mutate: recordBlogView } = useRecordBlogView();
 
   // Auto-seed real blog posts into backend if it's empty
   useEffect(() => {
@@ -497,12 +499,17 @@ export default function BlogPage() {
                         type="button"
                         className="glow-btn-cyan px-5 py-2 rounded font-body text-sm font-medium flex items-center gap-2"
                         aria-label={`Read more about ${displayFeatured.title}`}
-                        onClick={() =>
+                        onClick={() => {
                           trackBlogClick(
                             displayFeatured.title,
                             displayFeatured.category,
-                          )
-                        }
+                          );
+                          try {
+                            recordBlogView(displayFeatured.id);
+                          } catch {
+                            // fire-and-forget
+                          }
+                        }}
                       >
                         READ MORE
                         <ChevronRight className="w-4 h-4" />
@@ -596,6 +603,7 @@ export default function BlogPage() {
 
 function BlogCard({ post, index }: { post: BlogPost; index: number }) {
   const catCfg = categoryConfig[post.category] ?? categoryConfig.All;
+  const { mutate: recordBlogView } = useRecordBlogView();
 
   return (
     <article
@@ -697,7 +705,14 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
               className="flex items-center gap-1 font-body text-xs font-medium transition-colors duration-200"
               style={{ color: catCfg.color }}
               aria-label={`Read more about ${post.title}`}
-              onClick={() => trackBlogClick(post.title, post.category)}
+              onClick={() => {
+                trackBlogClick(post.title, post.category);
+                try {
+                  recordBlogView(post.id);
+                } catch {
+                  // fire-and-forget
+                }
+              }}
             >
               READ MORE
               <ChevronRight className="w-3 h-3" />

@@ -1,14 +1,27 @@
 import { ChevronDown } from "lucide-react";
 import { SiGithub, SiInstagram, SiLinkedin } from "react-icons/si";
-import { useGetResumeContent } from "../../hooks/useQueries";
+import {
+  useGetResumeContent,
+  useRecordResumeDownload,
+} from "../../hooks/useQueries";
 import { trackResumeDownload } from "../../utils/analytics";
 
 export default function HeroSection() {
   const { data: resumeContent } = useGetResumeContent();
+  const { mutate: recordResumeDownload } = useRecordResumeDownload();
   const resumeUrl =
     resumeContent?.resumeFileUrl && resumeContent.resumeFileUrl !== ""
       ? resumeContent.resumeFileUrl
       : "#";
+
+  const handleResumeDownload = () => {
+    trackResumeDownload();
+    try {
+      recordResumeDownload();
+    } catch {
+      // fire-and-forget
+    }
+  };
 
   const handleViewProjects = () => {
     document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
@@ -154,7 +167,7 @@ export default function HeroSection() {
             rel="noopener noreferrer"
             data-ocid="hero.download_resume_button"
             className="glow-btn-purple px-8 py-3 rounded font-body font-medium tracking-widest text-sm inline-flex items-center justify-center"
-            onClick={trackResumeDownload}
+            onClick={handleResumeDownload}
           >
             DOWNLOAD RESUME
           </a>

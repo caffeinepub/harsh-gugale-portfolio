@@ -17,40 +17,7 @@ export default defineConfig({
   build: {
     emptyOutDir: true,
     sourcemap: false,
-    // Enable terser minification for smaller JS bundles
-    minify: "esbuild",
-    // Raise chunk warning threshold slightly to avoid noise on large ICP deps
-    chunkSizeWarningLimit: 800,
-    rollupOptions: {
-      output: {
-        // Split vendor code into stable, long-cacheable chunks
-        manualChunks(id) {
-          // ICP / DFinity SDK — large & rarely changes
-          if (id.includes("@dfinity") || id.includes("@icp-sdk")) {
-            return "vendor-icp";
-          }
-          // React core
-          if (id.includes("react-dom") || id.includes("react/")) {
-            return "vendor-react";
-          }
-          // Router + query
-          if (
-            id.includes("@tanstack/react-router") ||
-            id.includes("@tanstack/react-query")
-          ) {
-            return "vendor-tanstack";
-          }
-          // Icon libraries
-          if (id.includes("lucide-react") || id.includes("react-icons")) {
-            return "vendor-icons";
-          }
-        },
-        // Content-hash filenames for aggressive long-term caching
-        entryFileNames: "assets/[name]-[hash].js",
-        chunkFileNames: "assets/[name]-[hash].js",
-        assetFileNames: "assets/[name]-[hash][extname]",
-      },
-    },
+    minify: false,
   },
   css: {
     postcss: "./postcss.config.js",

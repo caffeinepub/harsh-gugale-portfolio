@@ -34,6 +34,22 @@ export const Project = IDL.Record({
   'category' : IDL.Text,
   'techStack' : IDL.Vec(IDL.Text),
 });
+export const BlogViewStat = IDL.Record({
+  'id' : IDL.Nat,
+  'title' : IDL.Text,
+  'viewCount' : IDL.Nat,
+});
+export const ProjectViewStat = IDL.Record({
+  'id' : IDL.Nat,
+  'title' : IDL.Text,
+  'viewCount' : IDL.Nat,
+});
+export const AnalyticsData = IDL.Record({
+  'topBlogs' : IDL.Vec(BlogViewStat),
+  'topProjects' : IDL.Vec(ProjectViewStat),
+  'visitorCount' : IDL.Nat,
+  'resumeDownloadCount' : IDL.Nat,
+});
 export const ResumeContent = IDL.Record({
   'linkedin' : IDL.Text,
   'about' : IDL.Text,
@@ -70,12 +86,17 @@ export const idlService = IDL.Service({
   'getAllContacts' : IDL.Func([], [IDL.Vec(ContactSubmission)], ['query']),
   'getAllPosts' : IDL.Func([], [IDL.Vec(BlogPost)], ['query']),
   'getAllProjects' : IDL.Func([], [IDL.Vec(Project)], ['query']),
+  'getAnalytics' : IDL.Func([], [AnalyticsData], ['query']),
   'getFeaturedPost' : IDL.Func([], [IDL.Opt(BlogPost)], ['query']),
   'getPostsByCategory' : IDL.Func([IDL.Text], [IDL.Vec(BlogPost)], ['query']),
   'getResumeContent' : IDL.Func([], [ResumeContent], ['query']),
   'initializeBlogs' : IDL.Func([], [], []),
   'initializeData' : IDL.Func([], [], []),
   'initializeProjects' : IDL.Func([], [], []),
+  'recordBlogView' : IDL.Func([IDL.Nat], [], []),
+  'recordProjectView' : IDL.Func([IDL.Nat], [], []),
+  'recordResumeDownload' : IDL.Func([], [], []),
+  'recordVisit' : IDL.Func([], [], []),
   'submitContact' : IDL.Func([IDL.Text, IDL.Text, IDL.Text, IDL.Int], [], []),
   'updateBlogPost' : IDL.Func(
       [
@@ -150,6 +171,22 @@ export const idlFactory = ({ IDL }) => {
     'category' : IDL.Text,
     'techStack' : IDL.Vec(IDL.Text),
   });
+  const BlogViewStat = IDL.Record({
+    'id' : IDL.Nat,
+    'title' : IDL.Text,
+    'viewCount' : IDL.Nat,
+  });
+  const ProjectViewStat = IDL.Record({
+    'id' : IDL.Nat,
+    'title' : IDL.Text,
+    'viewCount' : IDL.Nat,
+  });
+  const AnalyticsData = IDL.Record({
+    'topBlogs' : IDL.Vec(BlogViewStat),
+    'topProjects' : IDL.Vec(ProjectViewStat),
+    'visitorCount' : IDL.Nat,
+    'resumeDownloadCount' : IDL.Nat,
+  });
   const ResumeContent = IDL.Record({
     'linkedin' : IDL.Text,
     'about' : IDL.Text,
@@ -186,12 +223,17 @@ export const idlFactory = ({ IDL }) => {
     'getAllContacts' : IDL.Func([], [IDL.Vec(ContactSubmission)], ['query']),
     'getAllPosts' : IDL.Func([], [IDL.Vec(BlogPost)], ['query']),
     'getAllProjects' : IDL.Func([], [IDL.Vec(Project)], ['query']),
+    'getAnalytics' : IDL.Func([], [AnalyticsData], ['query']),
     'getFeaturedPost' : IDL.Func([], [IDL.Opt(BlogPost)], ['query']),
     'getPostsByCategory' : IDL.Func([IDL.Text], [IDL.Vec(BlogPost)], ['query']),
     'getResumeContent' : IDL.Func([], [ResumeContent], ['query']),
     'initializeBlogs' : IDL.Func([], [], []),
     'initializeData' : IDL.Func([], [], []),
     'initializeProjects' : IDL.Func([], [], []),
+    'recordBlogView' : IDL.Func([IDL.Nat], [], []),
+    'recordProjectView' : IDL.Func([IDL.Nat], [], []),
+    'recordResumeDownload' : IDL.Func([], [], []),
+    'recordVisit' : IDL.Func([], [], []),
     'submitContact' : IDL.Func([IDL.Text, IDL.Text, IDL.Text, IDL.Int], [], []),
     'updateBlogPost' : IDL.Func(
         [

@@ -8,9 +8,10 @@ import {
   createRouter,
   useNavigate,
 } from "@tanstack/react-router";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import { useRecordVisit } from "./hooks/useQueries";
 // HomePage is above-the-fold — load eagerly
 import HomePage from "./pages/HomePage";
 // Non-critical routes: code-split and lazy-loaded
@@ -39,6 +40,16 @@ function PageLoader() {
 
 // Layout component wrapping all pages
 function RootLayout() {
+  const { mutate: recordVisit } = useRecordVisit();
+
+  useEffect(() => {
+    try {
+      recordVisit();
+    } catch {
+      // fire-and-forget — silently ignore errors
+    }
+  }, [recordVisit]);
+
   return (
     <div
       className="min-h-screen"

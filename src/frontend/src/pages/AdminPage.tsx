@@ -1,8 +1,10 @@
 import {
   AlertCircle,
+  BarChart3,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  Download,
   Eye,
   EyeOff,
   Loader2,
@@ -11,6 +13,7 @@ import {
   Plus,
   Terminal,
   Trash2,
+  Users,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -23,6 +26,7 @@ import {
   useDeleteProject,
   useGetAllPosts,
   useGetAllProjects,
+  useGetAnalytics,
   useGetResumeContent,
   useUpdateBlogPost,
   useUpdateProject,
@@ -30,7 +34,7 @@ import {
 } from "../hooks/useQueries";
 
 // ── Types ──────────────────────────────────────────────────────────────
-type AdminTab = "resume" | "blog" | "projects";
+type AdminTab = "resume" | "blog" | "projects" | "analytics";
 type BlogFormState = {
   id?: bigint;
   publishedAt?: bigint;
@@ -1604,6 +1608,325 @@ function ProjectsTab() {
   );
 }
 
+// ── Analytics Tab ──────────────────────────────────────────────────────
+function AnalyticsTab() {
+  const { data, isLoading } = useGetAnalytics();
+
+  if (isLoading) {
+    return (
+      <div
+        data-ocid="admin.analytics.loading_state"
+        className="flex items-center justify-center py-20 gap-3"
+      >
+        <Loader2
+          className="w-5 h-5 animate-spin"
+          style={{ color: "#00ff88" }}
+        />
+        <span
+          className="font-mono-code text-sm"
+          style={{ color: "rgba(0,255,136,0.5)" }}
+        >
+          LOADING_ANALYTICS...
+        </span>
+      </div>
+    );
+  }
+
+  const visitorCount = data?.visitorCount ?? BigInt(0);
+  const resumeDownloadCount = data?.resumeDownloadCount ?? BigInt(0);
+  const topBlogs = data?.topBlogs ?? [];
+  const topProjects = data?.topProjects ?? [];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-2">
+        <BarChart3 className="w-4 h-4" style={{ color: "#00ff88" }} />
+        <span
+          className="font-mono-code text-xs"
+          style={{ color: "rgba(0,255,136,0.6)" }}
+        >
+          SYSTEM_ANALYTICS :: REAL_TIME
+        </span>
+      </div>
+
+      {/* Stat cards row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Visitors card */}
+        <div
+          data-ocid="admin.analytics.visitors_card"
+          className="rounded-xl p-6 flex flex-col gap-3 relative overflow-hidden"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(0,212,255,0.06) 0%, rgba(0,212,255,0.02) 100%)",
+            border: "1px solid rgba(0,212,255,0.2)",
+            boxShadow: "0 0 30px rgba(0,212,255,0.05)",
+          }}
+        >
+          {/* Glow bg */}
+          <div
+            className="absolute top-0 right-0 w-24 h-24 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle at top right, rgba(0,212,255,0.12) 0%, transparent 70%)",
+            }}
+          />
+          <div className="flex items-center justify-between">
+            <span
+              className="font-mono-code text-xs tracking-widest"
+              style={{ color: "rgba(0,212,255,0.6)" }}
+            >
+              VISITORS
+            </span>
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{
+                background: "rgba(0,212,255,0.1)",
+                border: "1px solid rgba(0,212,255,0.2)",
+              }}
+            >
+              <Users className="w-4 h-4" style={{ color: "#00d4ff" }} />
+            </div>
+          </div>
+          <div
+            className="font-display font-bold"
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3rem)",
+              color: "#00d4ff",
+              textShadow:
+                "0 0 20px rgba(0,212,255,0.5), 0 0 40px rgba(0,212,255,0.2)",
+              lineHeight: 1,
+            }}
+          >
+            {visitorCount.toLocaleString()}
+          </div>
+          <span
+            className="font-body text-xs"
+            style={{ color: "rgba(232,244,248,0.4)" }}
+          >
+            Total site visits recorded
+          </span>
+        </div>
+
+        {/* Resume downloads card */}
+        <div
+          data-ocid="admin.analytics.downloads_card"
+          className="rounded-xl p-6 flex flex-col gap-3 relative overflow-hidden"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(168,85,247,0.06) 0%, rgba(168,85,247,0.02) 100%)",
+            border: "1px solid rgba(168,85,247,0.2)",
+            boxShadow: "0 0 30px rgba(168,85,247,0.05)",
+          }}
+        >
+          {/* Glow bg */}
+          <div
+            className="absolute top-0 right-0 w-24 h-24 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle at top right, rgba(168,85,247,0.12) 0%, transparent 70%)",
+            }}
+          />
+          <div className="flex items-center justify-between">
+            <span
+              className="font-mono-code text-xs tracking-widest"
+              style={{ color: "rgba(168,85,247,0.6)" }}
+            >
+              RESUME DOWNLOADS
+            </span>
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{
+                background: "rgba(168,85,247,0.1)",
+                border: "1px solid rgba(168,85,247,0.2)",
+              }}
+            >
+              <Download className="w-4 h-4" style={{ color: "#a855f7" }} />
+            </div>
+          </div>
+          <div
+            className="font-display font-bold"
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3rem)",
+              color: "#a855f7",
+              textShadow:
+                "0 0 20px rgba(168,85,247,0.5), 0 0 40px rgba(168,85,247,0.2)",
+              lineHeight: 1,
+            }}
+          >
+            {resumeDownloadCount.toLocaleString()}
+          </div>
+          <span
+            className="font-body text-xs"
+            style={{ color: "rgba(232,244,248,0.4)" }}
+          >
+            Resume file link clicks
+          </span>
+        </div>
+      </div>
+
+      {/* Ranked list cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Top blog posts */}
+        <div
+          data-ocid="admin.analytics.top_blogs_card"
+          className="rounded-xl p-5 flex flex-col gap-4"
+          style={{
+            background: "rgba(0,212,255,0.02)",
+            border: "1px solid rgba(0,212,255,0.15)",
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span
+              className="font-mono-code text-xs tracking-widest"
+              style={{ color: "rgba(0,212,255,0.7)" }}
+            >
+              TOP BLOG POSTS
+            </span>
+            <div
+              className="flex-1 h-px"
+              style={{ background: "rgba(0,212,255,0.1)" }}
+            />
+          </div>
+
+          {topBlogs.length === 0 ? (
+            <div
+              className="text-center py-6"
+              style={{ color: "rgba(0,212,255,0.3)" }}
+            >
+              <Eye className="w-6 h-6 mx-auto mb-2 opacity-40" />
+              <p className="font-mono-code text-xs">NO_DATA_YET</p>
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {topBlogs.slice(0, 5).map((blog, idx) => (
+                <div
+                  key={blog.id.toString()}
+                  className="flex items-center gap-3"
+                >
+                  <span
+                    className="font-mono-code text-xs font-bold flex-shrink-0 w-6"
+                    style={{
+                      color:
+                        idx === 0
+                          ? "#00d4ff"
+                          : idx === 1
+                            ? "rgba(0,212,255,0.7)"
+                            : "rgba(0,212,255,0.45)",
+                      textShadow:
+                        idx === 0 ? "0 0 8px rgba(0,212,255,0.5)" : "none",
+                    }}
+                  >
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
+                  <span
+                    className="font-body text-xs flex-1 truncate"
+                    style={{ color: "rgba(232,244,248,0.75)" }}
+                    title={blog.title}
+                  >
+                    {blog.title}
+                  </span>
+                  <div
+                    className="flex items-center gap-1 flex-shrink-0"
+                    style={{ color: "rgba(0,212,255,0.5)" }}
+                  >
+                    <Eye className="w-3 h-3" />
+                    <span className="font-mono-code text-xs">
+                      {blog.viewCount.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Top projects */}
+        <div
+          data-ocid="admin.analytics.top_projects_card"
+          className="rounded-xl p-5 flex flex-col gap-4"
+          style={{
+            background: "rgba(168,85,247,0.02)",
+            border: "1px solid rgba(168,85,247,0.15)",
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span
+              className="font-mono-code text-xs tracking-widest"
+              style={{ color: "rgba(168,85,247,0.7)" }}
+            >
+              TOP PROJECTS
+            </span>
+            <div
+              className="flex-1 h-px"
+              style={{ background: "rgba(168,85,247,0.1)" }}
+            />
+          </div>
+
+          {topProjects.length === 0 ? (
+            <div
+              className="text-center py-6"
+              style={{ color: "rgba(168,85,247,0.3)" }}
+            >
+              <Eye className="w-6 h-6 mx-auto mb-2 opacity-40" />
+              <p className="font-mono-code text-xs">NO_DATA_YET</p>
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {topProjects.slice(0, 5).map((proj, idx) => (
+                <div
+                  key={proj.id.toString()}
+                  className="flex items-center gap-3"
+                >
+                  <span
+                    className="font-mono-code text-xs font-bold flex-shrink-0 w-6"
+                    style={{
+                      color:
+                        idx === 0
+                          ? "#a855f7"
+                          : idx === 1
+                            ? "rgba(168,85,247,0.7)"
+                            : "rgba(168,85,247,0.45)",
+                      textShadow:
+                        idx === 0 ? "0 0 8px rgba(168,85,247,0.5)" : "none",
+                    }}
+                  >
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
+                  <span
+                    className="font-body text-xs flex-1 truncate"
+                    style={{ color: "rgba(232,244,248,0.75)" }}
+                    title={proj.title}
+                  >
+                    {proj.title}
+                  </span>
+                  <div
+                    className="flex items-center gap-1 flex-shrink-0"
+                    style={{ color: "rgba(168,85,247,0.5)" }}
+                  >
+                    <Eye className="w-3 h-3" />
+                    <span className="font-mono-code text-xs">
+                      {proj.viewCount.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Refresh hint */}
+      <p
+        className="font-mono-code text-xs text-center"
+        style={{ color: "rgba(232,244,248,0.2)" }}
+      >
+        DATA_REFRESH :: LIVE | TRACKING_ACTIVE
+      </p>
+    </div>
+  );
+}
+
 // ── Admin Dashboard ────────────────────────────────────────────────────
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<AdminTab>("resume");
@@ -1626,6 +1949,12 @@ function AdminDashboard() {
       label: "Projects Manager",
       ocid: "admin.projects_tab",
       color: "#a855f7",
+    },
+    {
+      id: "analytics",
+      label: "Analytics",
+      ocid: "admin.analytics_tab",
+      color: "#00ff88",
     },
   ];
 
@@ -1695,7 +2024,11 @@ function AdminDashboard() {
                   activeTab === tab.id ? tab.color : "rgba(232,244,248,0.4)",
                 background:
                   activeTab === tab.id
-                    ? `rgba(${tab.color === "#00d4ff" ? "0,212,255" : "123,47,255"},0.08)`
+                    ? tab.color === "#00d4ff"
+                      ? "rgba(0,212,255,0.08)"
+                      : tab.color === "#a855f7"
+                        ? "rgba(123,47,255,0.08)"
+                        : "rgba(0,255,136,0.08)"
                     : "transparent",
               }}
             >
@@ -1725,6 +2058,7 @@ function AdminDashboard() {
           {activeTab === "resume" && <ResumeTab />}
           {activeTab === "blog" && <BlogTab />}
           {activeTab === "projects" && <ProjectsTab />}
+          {activeTab === "analytics" && <AnalyticsTab />}
         </div>
       </div>
     </div>

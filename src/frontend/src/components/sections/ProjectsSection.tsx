@@ -1,6 +1,9 @@
 import { Cpu, ExternalLink, Github, Loader2 } from "lucide-react";
 import type { Project } from "../../backend.d";
-import { useGetAllProjects } from "../../hooks/useQueries";
+import {
+  useGetAllProjects,
+  useRecordProjectView,
+} from "../../hooks/useQueries";
 import { trackProjectClick } from "../../utils/analytics";
 
 const fallbackProjects: Project[] = [
@@ -201,6 +204,7 @@ function ProjectCard({
     bg: "rgba(0,212,255,0.08)",
     border: "rgba(0,212,255,0.25)",
   };
+  const { mutate: recordProjectView } = useRecordProjectView();
 
   return (
     <article
@@ -278,7 +282,14 @@ function ProjectCard({
                 boxShadow: `0 0 10px ${catStyle.color}15`,
               }}
               aria-label={`GitHub repository for ${project.title}`}
-              onClick={() => trackProjectClick(project.title, "github")}
+              onClick={() => {
+                trackProjectClick(project.title, "github");
+                try {
+                  recordProjectView(project.id);
+                } catch {
+                  // fire-and-forget
+                }
+              }}
             >
               <Github className="w-3.5 h-3.5" />
               GitHub
@@ -298,7 +309,14 @@ function ProjectCard({
                 boxShadow: "0 0 10px rgba(0,212,255,0.15)",
               }}
               aria-label={`Live demo for ${project.title}`}
-              onClick={() => trackProjectClick(project.title, "demo")}
+              onClick={() => {
+                trackProjectClick(project.title, "demo");
+                try {
+                  recordProjectView(project.id);
+                } catch {
+                  // fire-and-forget
+                }
+              }}
             >
               <ExternalLink className="w-3.5 h-3.5" />
               Live Demo
@@ -316,7 +334,14 @@ function ProjectCard({
                   color: catStyle.color,
                   boxShadow: `0 0 10px ${catStyle.color}15`,
                 }}
-                onClick={() => trackProjectClick(project.title, "view_details")}
+                onClick={() => {
+                  trackProjectClick(project.title, "view_details");
+                  try {
+                    recordProjectView(project.id);
+                  } catch {
+                    // fire-and-forget
+                  }
+                }}
               >
                 VIEW DETAILS
               </button>

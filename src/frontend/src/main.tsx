@@ -14,21 +14,7 @@ declare global {
   }
 }
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      // Cache backend data for 5 minutes before marking stale — avoids
-      // redundant canister calls on navigation and component re-mounts.
-      staleTime: 5 * 60 * 1000,
-      // Keep unused data in cache for 10 minutes (reduces cold fetches)
-      gcTime: 10 * 60 * 1000,
-      // Disable automatic retry storms — IC calls can be slow
-      retry: 1,
-      // Don't re-fetch on window focus (portfolio doesn't need live data)
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>

@@ -3,40 +3,12 @@ import List "mo:core/List";
 import Text "mo:core/Text";
 import Time "mo:core/Time";
 import Array "mo:core/Array";
-import Runtime "mo:core/Runtime";
+import Iter "mo:core/Iter";
 import Order "mo:core/Order";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
-  // ContactActor Types & Initialization
-  type ContactSubmission = {
-    name : Text;
-    email : Text;
-    message : Text;
-    timestamp : Int;
-  };
-
-  module ContactSubmission {
-    public func compareByTimestamp(a : ContactSubmission, b : ContactSubmission) : Order.Order {
-      Int.compare(a.timestamp, b.timestamp);
-    };
-  };
-
-  let contacts = List.empty<ContactSubmission>();
-
-  // ContactActor Methods
-  public shared ({ caller }) func submitContact(name : Text, email : Text, message : Text, timestamp : Int) : async () {
-    contacts.add({
-      name;
-      email;
-      message;
-      timestamp;
-    });
-  };
-
-  public query ({ caller }) func getAllContacts() : async [ContactSubmission] {
-    contacts.toArray().sort(ContactSubmission.compareByTimestamp);
-  };
-
   // BlogActor Types & Initialization
   type BlogPost = {
     id : Nat;
@@ -59,7 +31,6 @@ actor {
   let blogPosts = Map.empty<Nat, BlogPost>();
   var nextBlogId = 1;
 
-  // BlogActor Seed Data
   public shared ({ caller }) func initializeBlogs() : async () {
     if (blogPosts.isEmpty()) {
       let samplePosts = [
@@ -125,11 +96,12 @@ actor {
         },
       ];
 
+      var id = nextBlogId;
       for (post in samplePosts.values()) {
         blogPosts.add(
-          nextBlogId,
+          id,
           {
-            id = nextBlogId;
+            id;
             title = post.title;
             category = post.category;
             summary = post.summary;
@@ -140,12 +112,12 @@ actor {
             fileUrl = post.fileUrl;
           },
         );
-        nextBlogId += 1;
+        id += 1;
       };
+      nextBlogId := id;
     };
   };
 
-  // BlogActor Methods
   public query ({ caller }) func getAllPosts() : async [BlogPost] {
     blogPosts.values().toArray().sort(BlogPost.compareByPublishedAt);
   };
@@ -251,7 +223,6 @@ actor {
   let projects = Map.empty<Nat, Project>();
   var nextProjectId = 1;
 
-  // ProjectActor Seed Data
   public shared ({ caller }) func initializeProjects() : async () {
     if (projects.isEmpty()) {
       let sampleProjects = [
@@ -297,11 +268,12 @@ actor {
         },
       ];
 
+      var id = nextProjectId;
       for (project in sampleProjects.values()) {
         projects.add(
-          nextProjectId,
+          id,
           {
-            id = nextProjectId;
+            id;
             title = project.title;
             techStack = project.techStack;
             description = project.description;
@@ -310,12 +282,12 @@ actor {
             demoUrl = project.demoUrl;
           },
         );
-        nextProjectId += 1;
+        id += 1;
       };
+      nextProjectId := id;
     };
   };
 
-  // ProjectActor Methods
   public query ({ caller }) func getAllProjects() : async [Project] {
     projects.values().toArray().sort(Project.compareById);
   };
@@ -403,7 +375,6 @@ actor {
     github = "https://github.com/harshgugale";
   };
 
-  // ResumeActor Methods
   public query ({ caller }) func getResumeContent() : async ResumeContent {
     resumeContent;
   };
@@ -430,7 +401,129 @@ actor {
     };
   };
 
-  // Initialization Method to Seed Data
+  // ContactActor Types & Initialization
+  type ContactSubmission = {
+    name : Text;
+    email : Text;
+    message : Text;
+    timestamp : Int;
+  };
+
+  module ContactSubmission {
+    public func compareByTimestamp(a : ContactSubmission, b : ContactSubmission) : Order.Order {
+      Int.compare(a.timestamp, b.timestamp);
+    };
+  };
+
+  let contacts = List.empty<ContactSubmission>();
+
+  public shared ({ caller }) func submitContact(name : Text, email : Text, message : Text, timestamp : Int) : async () {
+    contacts.add({
+      name;
+      email;
+      message;
+      timestamp;
+    });
+  };
+
+  public query ({ caller }) func getAllContacts() : async [ContactSubmission] {
+    contacts.toArray().sort(ContactSubmission.compareByTimestamp);
+  };
+
+  // Analytics Extensions
+  var visitorCount = 0;
+  var resumeDownloadCount = 0;
+  let blogViewCounts = Map.empty<Nat, Nat>();
+  let projectViewCounts = Map.empty<Nat, Nat>();
+
+  public shared ({ caller }) func recordVisit() : async () {
+    visitorCount += 1;
+  };
+
+  public shared ({ caller }) func recordResumeDownload() : async () {
+    resumeDownloadCount += 1;
+  };
+
+  public shared ({ caller }) func recordBlogView(id : Nat) : async () {
+    blogViewCounts.add(id, switch (blogViewCounts.get(id)) {
+      case (null) { 1 };
+      case (?count) { count + 1 };
+    });
+  };
+
+  public shared ({ caller }) func recordProjectView(id : Nat) : async () {
+    projectViewCounts.add(id, switch (projectViewCounts.get(id)) {
+      case (null) { 1 };
+      case (?count) { count + 1 };
+    });
+  };
+
+  public type BlogViewStat = {
+    id : Nat;
+    title : Text;
+    viewCount : Nat;
+  };
+
+  public type ProjectViewStat = {
+    id : Nat;
+    title : Text;
+    viewCount : Nat;
+  };
+
+  public type AnalyticsData = {
+    visitorCount : Nat;
+    resumeDownloadCount : Nat;
+    topBlogs : [BlogViewStat];
+    topProjects : [ProjectViewStat];
+  };
+
+  public query ({ caller }) func getAnalytics() : async AnalyticsData {
+    let blogStats = blogViewCounts.toArray().map(
+      func((id, count)) {
+        {
+          id;
+          title = switch (blogPosts.get(id)) {
+            case (null) { "" };
+            case (?post) { post.title };
+          };
+          viewCount = count;
+        };
+      }
+    );
+
+    let projectStats = projectViewCounts.toArray().map(
+      func((id, count)) {
+        {
+          id;
+          title = switch (projects.get(id)) {
+            case (null) { "" };
+            case (?project) { project.title };
+          };
+          viewCount = count;
+        };
+      }
+    );
+
+    let topBlogs = blogStats.sort(
+      func(a, b) {
+        Nat.compare(b.viewCount, a.viewCount);
+      }
+    ).sliceToArray(0, if (blogStats.size() > 5) { 5 } else { blogStats.size() });
+
+    let topProjects = projectStats.sort(
+      func(a, b) {
+        Nat.compare(b.viewCount, a.viewCount);
+      }
+    ).sliceToArray(0, if (projectStats.size() > 5) { 5 } else { projectStats.size() });
+
+    {
+      visitorCount;
+      resumeDownloadCount;
+      topBlogs;
+      topProjects;
+    };
+  };
+
   public shared ({ caller }) func initializeData() : async () {
     await initializeBlogs();
     await initializeProjects();

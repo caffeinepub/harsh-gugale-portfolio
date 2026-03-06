@@ -10,6 +10,12 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface AnalyticsData {
+  'topBlogs' : Array<BlogViewStat>,
+  'topProjects' : Array<ProjectViewStat>,
+  'visitorCount' : bigint,
+  'resumeDownloadCount' : bigint,
+}
 export interface BlogPost {
   'id' : bigint,
   'title' : string,
@@ -20,6 +26,11 @@ export interface BlogPost {
   'isFeatured' : boolean,
   'category' : string,
   'fileUrl' : string,
+}
+export interface BlogViewStat {
+  'id' : bigint,
+  'title' : string,
+  'viewCount' : bigint,
 }
 export interface ContactSubmission {
   'name' : string,
@@ -35,6 +46,11 @@ export interface Project {
   'demoUrl' : string,
   'category' : string,
   'techStack' : Array<string>,
+}
+export interface ProjectViewStat {
+  'id' : bigint,
+  'title' : string,
+  'viewCount' : bigint,
 }
 export interface ResumeContent {
   'linkedin' : string,
@@ -60,12 +76,17 @@ export interface _SERVICE {
   'getAllContacts' : ActorMethod<[], Array<ContactSubmission>>,
   'getAllPosts' : ActorMethod<[], Array<BlogPost>>,
   'getAllProjects' : ActorMethod<[], Array<Project>>,
+  'getAnalytics' : ActorMethod<[], AnalyticsData>,
   'getFeaturedPost' : ActorMethod<[], [] | [BlogPost]>,
   'getPostsByCategory' : ActorMethod<[string], Array<BlogPost>>,
   'getResumeContent' : ActorMethod<[], ResumeContent>,
   'initializeBlogs' : ActorMethod<[], undefined>,
   'initializeData' : ActorMethod<[], undefined>,
   'initializeProjects' : ActorMethod<[], undefined>,
+  'recordBlogView' : ActorMethod<[bigint], undefined>,
+  'recordProjectView' : ActorMethod<[bigint], undefined>,
+  'recordResumeDownload' : ActorMethod<[], undefined>,
+  'recordVisit' : ActorMethod<[], undefined>,
   'submitContact' : ActorMethod<[string, string, string, bigint], undefined>,
   'updateBlogPost' : ActorMethod<
     [bigint, string, string, string, string, string, bigint, boolean, string],
