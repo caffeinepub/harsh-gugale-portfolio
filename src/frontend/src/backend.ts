@@ -105,6 +105,25 @@ export interface BlogViewStat {
     title: string;
     viewCount: bigint;
 }
+export interface ProfileMeta {
+    instagram: string;
+    currentlyBuilding: string;
+    profileImageUrl: string;
+}
+export interface Skill {
+    name: string;
+    level: bigint;
+}
+export interface Experience {
+    id: bigint;
+    title: string;
+    date: string;
+    tags: Array<string>;
+    description: string;
+    accentColor: string;
+    company: string;
+    badge: string;
+}
 export interface ContactSubmission {
     name: string;
     email: string;
@@ -116,14 +135,20 @@ export interface ProjectViewStat {
     title: string;
     viewCount: bigint;
 }
-export interface Project {
+export interface MediaItem {
     id: bigint;
     title: string;
-    description: string;
-    githubUrl: string;
-    demoUrl: string;
+    itemOrder: bigint;
+    mediaUrl: string;
+    caption: string;
+    mediaType: string;
     category: string;
-    techStack: Array<string>;
+}
+export interface SkillCategory {
+    id: bigint;
+    name: string;
+    accentColor: string;
+    skills: Array<Skill>;
 }
 export interface ResumeContent {
     linkedin: string;
@@ -135,6 +160,15 @@ export interface ResumeContent {
     github: string;
     resumeFileUrl: string;
 }
+export interface Project {
+    id: bigint;
+    title: string;
+    description: string;
+    githubUrl: string;
+    demoUrl: string;
+    category: string;
+    techStack: Array<string>;
+}
 export interface AnalyticsData {
     topBlogs: Array<BlogViewStat>;
     topProjects: Array<ProjectViewStat>;
@@ -143,27 +177,44 @@ export interface AnalyticsData {
 }
 export interface backendInterface {
     addBlogPost(title: string, category: string, summary: string, content: string, author: string, publishedAt: bigint, isFeatured: boolean, fileUrl: string): Promise<bigint>;
+    addExperience(title: string, company: string, badge: string, date: string, description: string, tags: Array<string>, accentColor: string): Promise<bigint>;
+    addMediaItem(title: string, category: string, caption: string, mediaUrl: string, mediaType: string, itemOrder: bigint): Promise<bigint>;
     addProject(title: string, techStack: Array<string>, description: string, category: string, githubUrl: string, demoUrl: string): Promise<bigint>;
+    changeAdminPassword(currentPassword: string, newPassword: string): Promise<boolean>;
     deleteBlogPost(id: bigint): Promise<boolean>;
+    deleteExperience(id: bigint): Promise<boolean>;
+    deleteMediaItem(id: bigint): Promise<boolean>;
     deleteProject(id: bigint): Promise<boolean>;
     getAllContacts(): Promise<Array<ContactSubmission>>;
+    getAllExperiences(): Promise<Array<Experience>>;
+    getAllMediaItems(): Promise<Array<MediaItem>>;
     getAllPosts(): Promise<Array<BlogPost>>;
     getAllProjects(): Promise<Array<Project>>;
     getAnalytics(): Promise<AnalyticsData>;
     getFeaturedPost(): Promise<BlogPost | null>;
     getPostsByCategory(category: string): Promise<Array<BlogPost>>;
+    getProfileMeta(): Promise<ProfileMeta>;
     getResumeContent(): Promise<ResumeContent>;
+    getSkillCategories(): Promise<Array<SkillCategory>>;
     initializeBlogs(): Promise<void>;
     initializeData(): Promise<void>;
+    initializeExperiences(): Promise<void>;
+    initializeMediaItems(): Promise<void>;
     initializeProjects(): Promise<void>;
+    initializeSkills(): Promise<void>;
     recordBlogView(id: bigint): Promise<void>;
     recordProjectView(id: bigint): Promise<void>;
     recordResumeDownload(): Promise<void>;
     recordVisit(): Promise<void>;
     submitContact(name: string, email: string, message: string, timestamp: bigint): Promise<void>;
     updateBlogPost(id: bigint, title: string, category: string, summary: string, content: string, author: string, publishedAt: bigint, isFeatured: boolean, fileUrl: string): Promise<boolean>;
+    updateExperience(id: bigint, title: string, company: string, badge: string, date: string, description: string, tags: Array<string>, accentColor: string): Promise<boolean>;
+    updateMediaItem(id: bigint, title: string, category: string, caption: string, mediaUrl: string, mediaType: string, itemOrder: bigint): Promise<boolean>;
+    updateProfileMeta(profileImageUrl: string, instagram: string, currentlyBuilding: string): Promise<void>;
     updateProject(id: bigint, title: string, techStack: Array<string>, description: string, category: string, githubUrl: string, demoUrl: string): Promise<boolean>;
     updateResumeContent(name: string, tagline: string, about: string, careerObjective: string, resumeFileUrl: string, email: string, linkedin: string, github: string): Promise<void>;
+    updateSkillCategory(id: bigint, name: string, accentColor: string, skills: Array<Skill>): Promise<boolean>;
+    verifyAdminPassword(password: string): Promise<boolean>;
 }
 import type { BlogPost as _BlogPost } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -182,6 +233,34 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async addExperience(arg0: string, arg1: string, arg2: string, arg3: string, arg4: string, arg5: Array<string>, arg6: string): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addExperience(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addExperience(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+            return result;
+        }
+    }
+    async addMediaItem(arg0: string, arg1: string, arg2: string, arg3: string, arg4: string, arg5: bigint): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addMediaItem(arg0, arg1, arg2, arg3, arg4, arg5);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addMediaItem(arg0, arg1, arg2, arg3, arg4, arg5);
+            return result;
+        }
+    }
     async addProject(arg0: string, arg1: Array<string>, arg2: string, arg3: string, arg4: string, arg5: string): Promise<bigint> {
         if (this.processError) {
             try {
@@ -196,6 +275,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async changeAdminPassword(arg0: string, arg1: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.changeAdminPassword(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.changeAdminPassword(arg0, arg1);
+            return result;
+        }
+    }
     async deleteBlogPost(arg0: bigint): Promise<boolean> {
         if (this.processError) {
             try {
@@ -207,6 +300,34 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.deleteBlogPost(arg0);
+            return result;
+        }
+    }
+    async deleteExperience(arg0: bigint): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteExperience(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteExperience(arg0);
+            return result;
+        }
+    }
+    async deleteMediaItem(arg0: bigint): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteMediaItem(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteMediaItem(arg0);
             return result;
         }
     }
@@ -235,6 +356,34 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getAllContacts();
+            return result;
+        }
+    }
+    async getAllExperiences(): Promise<Array<Experience>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllExperiences();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllExperiences();
+            return result;
+        }
+    }
+    async getAllMediaItems(): Promise<Array<MediaItem>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllMediaItems();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllMediaItems();
             return result;
         }
     }
@@ -308,6 +457,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getProfileMeta(): Promise<ProfileMeta> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getProfileMeta();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getProfileMeta();
+            return result;
+        }
+    }
     async getResumeContent(): Promise<ResumeContent> {
         if (this.processError) {
             try {
@@ -319,6 +482,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getResumeContent();
+            return result;
+        }
+    }
+    async getSkillCategories(): Promise<Array<SkillCategory>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getSkillCategories();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getSkillCategories();
             return result;
         }
     }
@@ -350,6 +527,34 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async initializeExperiences(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.initializeExperiences();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.initializeExperiences();
+            return result;
+        }
+    }
+    async initializeMediaItems(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.initializeMediaItems();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.initializeMediaItems();
+            return result;
+        }
+    }
     async initializeProjects(): Promise<void> {
         if (this.processError) {
             try {
@@ -361,6 +566,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.initializeProjects();
+            return result;
+        }
+    }
+    async initializeSkills(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.initializeSkills();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.initializeSkills();
             return result;
         }
     }
@@ -448,6 +667,48 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async updateExperience(arg0: bigint, arg1: string, arg2: string, arg3: string, arg4: string, arg5: string, arg6: Array<string>, arg7: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateExperience(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateExperience(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+            return result;
+        }
+    }
+    async updateMediaItem(arg0: bigint, arg1: string, arg2: string, arg3: string, arg4: string, arg5: string, arg6: bigint): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateMediaItem(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateMediaItem(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+            return result;
+        }
+    }
+    async updateProfileMeta(arg0: string, arg1: string, arg2: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateProfileMeta(arg0, arg1, arg2);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateProfileMeta(arg0, arg1, arg2);
+            return result;
+        }
+    }
     async updateProject(arg0: bigint, arg1: string, arg2: Array<string>, arg3: string, arg4: string, arg5: string, arg6: string): Promise<boolean> {
         if (this.processError) {
             try {
@@ -473,6 +734,34 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.updateResumeContent(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+            return result;
+        }
+    }
+    async updateSkillCategory(arg0: bigint, arg1: string, arg2: string, arg3: Array<Skill>): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateSkillCategory(arg0, arg1, arg2, arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateSkillCategory(arg0, arg1, arg2, arg3);
+            return result;
+        }
+    }
+    async verifyAdminPassword(arg0: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.verifyAdminPassword(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.verifyAdminPassword(arg0);
             return result;
         }
     }

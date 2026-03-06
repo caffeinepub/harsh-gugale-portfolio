@@ -526,6 +526,16 @@
   }
 }
 
+/* ── Canvas background layer ─────────────────────────────────────────── */
+.bg-canvas-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  will-change: transform;
+  opacity: 0.65;
+}
+
 /* ── Print: hide decorative elements ─────────────────────────────── */
 @media print {
   .hero-grid-bg,
@@ -533,7 +543,8 @@
   .scan-line,
   .particle,
   .node-pulse-cyan,
-  .node-pulse-purple {
+  .node-pulse-purple,
+  .bg-canvas-layer {
     display: none !important;
   }
 }

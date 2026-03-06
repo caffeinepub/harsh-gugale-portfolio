@@ -1,6 +1,13 @@
 import { Activity, Cpu, Shield, Zap } from "lucide-react";
+import { useGetProfileMeta, useGetResumeContent } from "../../hooks/useQueries";
 
 export default function AboutSection() {
+  const { data: profileMeta } = useGetProfileMeta();
+  const { data: resumeContent } = useGetResumeContent();
+
+  const hasProfileImage =
+    profileMeta?.profileImageUrl && profileMeta.profileImageUrl !== "";
+
   return (
     <section
       id="about"
@@ -55,23 +62,35 @@ export default function AboutSection() {
             />
 
             <div className="mb-6">
-              {/* Avatar placeholder */}
-              <div
-                className="w-20 h-20 rounded-full mb-6 flex items-center justify-center"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(0,212,255,0.15), rgba(123,47,255,0.15))",
-                  border: "2px solid rgba(0,212,255,0.3)",
-                  boxShadow: "0 0 20px rgba(0,212,255,0.15)",
-                }}
-              >
-                <span
-                  className="font-display font-bold text-2xl"
-                  style={{ color: "#00d4ff" }}
+              {/* Avatar: show image if profileImageUrl is set, else show HG initials */}
+              {hasProfileImage ? (
+                <img
+                  src={profileMeta!.profileImageUrl}
+                  alt="Harsh Gugale"
+                  className="w-20 h-20 rounded-full mb-6 object-cover"
+                  style={{
+                    border: "2px solid rgba(0,212,255,0.3)",
+                    boxShadow: "0 0 20px rgba(0,212,255,0.15)",
+                  }}
+                />
+              ) : (
+                <div
+                  className="w-20 h-20 rounded-full mb-6 flex items-center justify-center"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(0,212,255,0.15), rgba(123,47,255,0.15))",
+                    border: "2px solid rgba(0,212,255,0.3)",
+                    boxShadow: "0 0 20px rgba(0,212,255,0.15)",
+                  }}
                 >
-                  HG
-                </span>
-              </div>
+                  <span
+                    className="font-display font-bold text-2xl"
+                    style={{ color: "#00d4ff" }}
+                  >
+                    HG
+                  </span>
+                </div>
+              )}
 
               <h3
                 className="font-display font-bold text-xl mb-1"
@@ -182,41 +201,54 @@ export default function AboutSection() {
               </div>
 
               <div className="space-y-4">
-                <p
-                  className="font-body text-sm leading-relaxed"
-                  style={{ color: "rgba(232,244,248,0.75)" }}
-                >
-                  <span style={{ color: "#00d4ff" }}>{"> "}</span>
-                  Embedded Systems Intern at an EV manufacturing company —
-                  hands-on with{" "}
-                  <span style={{ color: "#00d4ff" }}>CAN Protocol</span>,
-                  digital instrument cluster systems, firmware debugging, and
-                  sensor interfacing within real automotive environments.
-                </p>
-                <p
-                  className="font-body text-sm leading-relaxed"
-                  style={{ color: "rgba(232,244,248,0.75)" }}
-                >
-                  <span style={{ color: "#a855f7" }}>{"> "}</span>
-                  DRDO Intern — developed a{" "}
-                  <span style={{ color: "#a855f7" }}>
-                    Velocity of Detonation measuring system
-                  </span>{" "}
-                  using oscillographic techniques and high-speed signal
-                  conditioning circuits for defense applications.
-                </p>
-                <p
-                  className="font-body text-sm leading-relaxed"
-                  style={{ color: "rgba(232,244,248,0.75)" }}
-                >
-                  <span style={{ color: "#00ff88" }}>{"> "}</span>
-                  Strong foundation in microcontrollers{" "}
-                  <span style={{ color: "#00ff88" }}>
-                    (STM32, ESP32, Arduino)
-                  </span>
-                  , communication protocols (UART, SPI, I2C, CAN), and real-time
-                  firmware development.
-                </p>
+                {resumeContent?.about && resumeContent.about !== "" ? (
+                  <p
+                    className="font-body text-sm leading-relaxed"
+                    style={{ color: "rgba(232,244,248,0.75)" }}
+                  >
+                    <span style={{ color: "#00d4ff" }}>{"> "}</span>
+                    {resumeContent.about}
+                  </p>
+                ) : (
+                  <>
+                    <p
+                      className="font-body text-sm leading-relaxed"
+                      style={{ color: "rgba(232,244,248,0.75)" }}
+                    >
+                      <span style={{ color: "#00d4ff" }}>{"> "}</span>
+                      Embedded Systems Intern at an EV manufacturing company —
+                      hands-on with{" "}
+                      <span style={{ color: "#00d4ff" }}>CAN Protocol</span>,
+                      digital instrument cluster systems, firmware debugging,
+                      and sensor interfacing within real automotive
+                      environments.
+                    </p>
+                    <p
+                      className="font-body text-sm leading-relaxed"
+                      style={{ color: "rgba(232,244,248,0.75)" }}
+                    >
+                      <span style={{ color: "#a855f7" }}>{"> "}</span>
+                      DRDO Intern — developed a{" "}
+                      <span style={{ color: "#a855f7" }}>
+                        Velocity of Detonation measuring system
+                      </span>{" "}
+                      using oscillographic techniques and high-speed signal
+                      conditioning circuits for defense applications.
+                    </p>
+                    <p
+                      className="font-body text-sm leading-relaxed"
+                      style={{ color: "rgba(232,244,248,0.75)" }}
+                    >
+                      <span style={{ color: "#00ff88" }}>{"> "}</span>
+                      Strong foundation in microcontrollers{" "}
+                      <span style={{ color: "#00ff88" }}>
+                        (STM32, ESP32, Arduino)
+                      </span>
+                      , communication protocols (UART, SPI, I2C, CAN), and
+                      real-time firmware development.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -248,11 +280,18 @@ export default function AboutSection() {
                 className="font-body text-sm leading-relaxed italic"
                 style={{ color: "rgba(232,244,248,0.85)" }}
               >
-                "To design intelligent embedded architectures that integrate AI
-                with real-time hardware systems for{" "}
-                <span style={{ color: "#00d4ff" }}>automotive</span> and{" "}
-                <span style={{ color: "#a855f7" }}>autonomous</span>{" "}
-                applications."
+                {resumeContent?.careerObjective &&
+                resumeContent.careerObjective !== "" ? (
+                  `"${resumeContent.careerObjective}"`
+                ) : (
+                  <>
+                    "To design intelligent embedded architectures that integrate
+                    AI with real-time hardware systems for{" "}
+                    <span style={{ color: "#00d4ff" }}>automotive</span> and{" "}
+                    <span style={{ color: "#a855f7" }}>autonomous</span>{" "}
+                    applications."
+                  </>
+                )}
               </p>
             </div>
           </div>

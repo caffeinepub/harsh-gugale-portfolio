@@ -38,6 +38,30 @@ export interface ContactSubmission {
   'message' : string,
   'timestamp' : bigint,
 }
+export interface Experience {
+  'id' : bigint,
+  'title' : string,
+  'date' : string,
+  'tags' : Array<string>,
+  'description' : string,
+  'accentColor' : string,
+  'company' : string,
+  'badge' : string,
+}
+export interface MediaItem {
+  'id' : bigint,
+  'title' : string,
+  'itemOrder' : bigint,
+  'mediaUrl' : string,
+  'caption' : string,
+  'mediaType' : string,
+  'category' : string,
+}
+export interface ProfileMeta {
+  'instagram' : string,
+  'currentlyBuilding' : string,
+  'profileImageUrl' : string,
+}
 export interface Project {
   'id' : bigint,
   'title' : string,
@@ -62,27 +86,52 @@ export interface ResumeContent {
   'github' : string,
   'resumeFileUrl' : string,
 }
+export interface Skill { 'name' : string, 'level' : bigint }
+export interface SkillCategory {
+  'id' : bigint,
+  'name' : string,
+  'accentColor' : string,
+  'skills' : Array<Skill>,
+}
 export interface _SERVICE {
   'addBlogPost' : ActorMethod<
     [string, string, string, string, string, bigint, boolean, string],
+    bigint
+  >,
+  'addExperience' : ActorMethod<
+    [string, string, string, string, string, Array<string>, string],
+    bigint
+  >,
+  'addMediaItem' : ActorMethod<
+    [string, string, string, string, string, bigint],
     bigint
   >,
   'addProject' : ActorMethod<
     [string, Array<string>, string, string, string, string],
     bigint
   >,
+  'changeAdminPassword' : ActorMethod<[string, string], boolean>,
   'deleteBlogPost' : ActorMethod<[bigint], boolean>,
+  'deleteExperience' : ActorMethod<[bigint], boolean>,
+  'deleteMediaItem' : ActorMethod<[bigint], boolean>,
   'deleteProject' : ActorMethod<[bigint], boolean>,
   'getAllContacts' : ActorMethod<[], Array<ContactSubmission>>,
+  'getAllExperiences' : ActorMethod<[], Array<Experience>>,
+  'getAllMediaItems' : ActorMethod<[], Array<MediaItem>>,
   'getAllPosts' : ActorMethod<[], Array<BlogPost>>,
   'getAllProjects' : ActorMethod<[], Array<Project>>,
   'getAnalytics' : ActorMethod<[], AnalyticsData>,
   'getFeaturedPost' : ActorMethod<[], [] | [BlogPost]>,
   'getPostsByCategory' : ActorMethod<[string], Array<BlogPost>>,
+  'getProfileMeta' : ActorMethod<[], ProfileMeta>,
   'getResumeContent' : ActorMethod<[], ResumeContent>,
+  'getSkillCategories' : ActorMethod<[], Array<SkillCategory>>,
   'initializeBlogs' : ActorMethod<[], undefined>,
   'initializeData' : ActorMethod<[], undefined>,
+  'initializeExperiences' : ActorMethod<[], undefined>,
+  'initializeMediaItems' : ActorMethod<[], undefined>,
   'initializeProjects' : ActorMethod<[], undefined>,
+  'initializeSkills' : ActorMethod<[], undefined>,
   'recordBlogView' : ActorMethod<[bigint], undefined>,
   'recordProjectView' : ActorMethod<[bigint], undefined>,
   'recordResumeDownload' : ActorMethod<[], undefined>,
@@ -92,6 +141,15 @@ export interface _SERVICE {
     [bigint, string, string, string, string, string, bigint, boolean, string],
     boolean
   >,
+  'updateExperience' : ActorMethod<
+    [bigint, string, string, string, string, string, Array<string>, string],
+    boolean
+  >,
+  'updateMediaItem' : ActorMethod<
+    [bigint, string, string, string, string, string, bigint],
+    boolean
+  >,
+  'updateProfileMeta' : ActorMethod<[string, string, string], undefined>,
   'updateProject' : ActorMethod<
     [bigint, string, Array<string>, string, string, string, string],
     boolean
@@ -100,6 +158,11 @@ export interface _SERVICE {
     [string, string, string, string, string, string, string, string],
     undefined
   >,
+  'updateSkillCategory' : ActorMethod<
+    [bigint, string, string, Array<Skill>],
+    boolean
+  >,
+  'verifyAdminPassword' : ActorMethod<[string], boolean>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

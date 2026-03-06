@@ -1,5 +1,7 @@
-import { Camera, Film, Play, Wind } from "lucide-react";
+import { Camera, Film, Loader2, Play, Wind } from "lucide-react";
+import { useEffect } from "react";
 import { useState } from "react";
+import { useGetAllMediaItems, useInitializeData } from "../hooks/useQueries";
 
 type Category =
   | "All"
@@ -8,126 +10,151 @@ type Category =
   | "Drone Shots"
   | "Short Vlogs";
 
-const mediaItems = [
+// ── Static fallback items ──────────────────────────────────────────────
+const staticMediaItems = [
   {
     id: 1,
     title: "Ladakh Valley at Dusk",
-    category: "Travel Photography" as Category,
+    category: "Travel Photography" as const,
     caption: "Golden hour over the Indus River Valley",
     gradient:
       "linear-gradient(135deg, #0a1128 0%, #1a3a6e 50%, #00d4ff22 100%)",
     aspectRatio: "tall",
     icon: Camera,
+    mediaUrl: "",
+    mediaType: "Photo",
   },
   {
     id: 2,
     title: "Circuit Board Timelapse",
-    category: "Cinematic Reels" as Category,
+    category: "Cinematic Reels" as const,
     caption: "Assembly line of tomorrow's technology",
     gradient:
       "linear-gradient(135deg, #0d0d1a 0%, #1a0d2e 50%, #7b2fff33 100%)",
     aspectRatio: "wide",
     icon: Film,
+    mediaUrl: "",
+    mediaType: "Reel",
   },
   {
     id: 3,
     title: "Coastal Aerial 4K",
-    category: "Drone Shots" as Category,
+    category: "Drone Shots" as const,
     caption: "Konkan coastline from 400m altitude",
     gradient:
       "linear-gradient(135deg, #060b18 0%, #0d2b45 50%, #00d4ff1a 100%)",
     aspectRatio: "square",
     icon: Wind,
+    mediaUrl: "",
+    mediaType: "Drone",
   },
   {
     id: 4,
     title: "Engineering Lab Vlog",
-    category: "Short Vlogs" as Category,
+    category: "Short Vlogs" as const,
     caption: "Behind the scenes: firmware debugging day",
     gradient:
       "linear-gradient(135deg, #0a0e1a 0%, #1f1a3a 50%, #a855f733 100%)",
     aspectRatio: "square",
     icon: Play,
+    mediaUrl: "",
+    mediaType: "Vlog",
   },
   {
     id: 5,
     title: "Himachal Snowfields",
-    category: "Travel Photography" as Category,
+    category: "Travel Photography" as const,
     caption: "Rohtang Pass in early winter",
     gradient:
       "linear-gradient(135deg, #060c1e 0%, #0d1e3a 50%, #00d4ff2a 100%)",
     aspectRatio: "wide",
     icon: Camera,
+    mediaUrl: "",
+    mediaType: "Photo",
   },
   {
     id: 6,
     title: "Mumbai Hyperlapses",
-    category: "Cinematic Reels" as Category,
+    category: "Cinematic Reels" as const,
     caption: "City that never sleeps, from above",
     gradient:
       "linear-gradient(135deg, #1a0d0d 0%, #2e1a0a 50%, #ff880033 100%)",
     aspectRatio: "tall",
     icon: Film,
+    mediaUrl: "",
+    mediaType: "Reel",
   },
   {
     id: 7,
     title: "Tech Campus Flyover",
-    category: "Drone Shots" as Category,
+    category: "Drone Shots" as const,
     caption: "Aerial survey of innovation district",
     gradient:
       "linear-gradient(135deg, #060b18 0%, #152838 50%, #00ff8822 100%)",
     aspectRatio: "square",
     icon: Wind,
+    mediaUrl: "",
+    mediaType: "Drone",
   },
   {
     id: 8,
     title: "EV Expo 2024",
-    category: "Short Vlogs" as Category,
+    category: "Short Vlogs" as const,
     caption: "Exploring the future of mobility",
     gradient:
       "linear-gradient(135deg, #0a1428 0%, #1a2a40 50%, #00d4ff1a 100%)",
     aspectRatio: "square",
     icon: Play,
+    mediaUrl: "",
+    mediaType: "Vlog",
   },
   {
     id: 9,
     title: "Rajasthan Desert Dawn",
-    category: "Travel Photography" as Category,
+    category: "Travel Photography" as const,
     caption: "First light over the Thar Desert",
     gradient:
       "linear-gradient(135deg, #1a1005 0%, #3d2a10 50%, #ffaa0033 100%)",
     aspectRatio: "tall",
     icon: Camera,
+    mediaUrl: "",
+    mediaType: "Photo",
   },
   {
     id: 10,
     title: "PCB Manufacturing Reel",
-    category: "Cinematic Reels" as Category,
+    category: "Cinematic Reels" as const,
     caption: "Where circuits come to life",
     gradient:
       "linear-gradient(135deg, #050d15 0%, #102030 50%, #00d4ff2a 100%)",
     aspectRatio: "wide",
     icon: Film,
+    mediaUrl: "",
+    mediaType: "Reel",
   },
   {
     id: 11,
     title: "Western Ghats From Above",
-    category: "Drone Shots" as Category,
+    category: "Drone Shots" as const,
     caption: "Biodiversity hotspot at monsoon peak",
     gradient:
       "linear-gradient(135deg, #051505 0%, #0d2b1a 50%, #00ff8822 100%)",
     aspectRatio: "square",
     icon: Wind,
+    mediaUrl: "",
+    mediaType: "Drone",
   },
   {
     id: 12,
     title: "Lab to Launch Vlog",
-    category: "Short Vlogs" as Category,
+    category: "Short Vlogs" as const,
     caption: "First field deployment of the rover project",
     gradient:
       "linear-gradient(135deg, #0a0a1e 0%, #1a1a3a 50%, #7b2fff22 100%)",
     aspectRatio: "square",
     icon: Play,
+    mediaUrl: "",
+    mediaType: "Vlog",
   },
 ];
 
@@ -141,47 +168,129 @@ const categories: Category[] = [
 
 const categoryConfig: Record<
   string,
-  { color: string; bg: string; border: string; ocid: string }
+  { color: string; bg: string; border: string; ocid: string; gradient: string }
 > = {
   All: {
     color: "#00d4ff",
     bg: "rgba(0,212,255,0.1)",
     border: "rgba(0,212,255,0.3)",
     ocid: "media.all_tab",
+    gradient:
+      "linear-gradient(135deg, #0a1128 0%, #1a3a6e 50%, #00d4ff22 100%)",
   },
   "Travel Photography": {
     color: "#a855f7",
     bg: "rgba(168,85,247,0.1)",
     border: "rgba(168,85,247,0.3)",
     ocid: "media.travel_tab",
+    gradient:
+      "linear-gradient(135deg, #0a1128 0%, #1a3a6e 50%, #a855f722 100%)",
   },
   "Cinematic Reels": {
     color: "#00d4ff",
     bg: "rgba(0,212,255,0.1)",
     border: "rgba(0,212,255,0.3)",
     ocid: "media.reels_tab",
+    gradient:
+      "linear-gradient(135deg, #0d0d1a 0%, #1a0d2e 50%, #00d4ff33 100%)",
   },
   "Drone Shots": {
     color: "#00ff88",
     bg: "rgba(0,255,136,0.1)",
     border: "rgba(0,255,136,0.3)",
     ocid: "media.drone_tab",
+    gradient:
+      "linear-gradient(135deg, #060b18 0%, #0d2b45 50%, #00ff8822 100%)",
   },
   "Short Vlogs": {
     color: "#ff8800",
     bg: "rgba(255,136,0,0.1)",
     border: "rgba(255,136,0,0.3)",
     ocid: "media.vlogs_tab",
+    gradient:
+      "linear-gradient(135deg, #0a0e1a 0%, #1f1a3a 50%, #ff880033 100%)",
   },
 };
 
+// Map media type to icon component
+function getIconForType(mediaType: string) {
+  switch (mediaType.toLowerCase()) {
+    case "photo":
+      return Camera;
+    case "reel":
+      return Film;
+    case "drone":
+      return Wind;
+    case "vlog":
+      return Play;
+    default:
+      return Camera;
+  }
+}
+
+const aspectHeights: Record<string, string> = {
+  tall: "260px",
+  wide: "180px",
+  square: "220px",
+};
+
+// Round-robin aspect ratios for dynamic items
+const ASPECT_CYCLE = ["tall", "wide", "square", "square", "wide", "tall"];
+
 export default function MediaPage() {
   const [activeCategory, setActiveCategory] = useState<Category>("All");
+  const { data: backendItems, isLoading } = useGetAllMediaItems();
+  const { mutate: initData } = useInitializeData();
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: fire-and-forget seed on mount
+  useEffect(() => {
+    try {
+      initData();
+    } catch {
+      // fire-and-forget
+    }
+  }, []);
+
+  // Build display items: backend wins if non-empty, otherwise fallback
+  const loaded = !isLoading;
+  const hasBackend = loaded && backendItems && backendItems.length > 0;
+
+  type DisplayItem = {
+    id: number;
+    title: string;
+    category: string;
+    caption: string;
+    gradient: string;
+    aspectRatio: string;
+    icon: typeof Camera;
+    mediaUrl: string;
+  };
+
+  const allItems: DisplayItem[] = hasBackend
+    ? backendItems.map((item, idx) => {
+        const cfg = categoryConfig[item.category];
+        const gradient =
+          cfg?.gradient ??
+          "linear-gradient(135deg, #0a1128 0%, #1a3a6e 50%, #00d4ff22 100%)";
+        const aspectRatio = ASPECT_CYCLE[idx % ASPECT_CYCLE.length];
+        const Icon = getIconForType(item.mediaType);
+        return {
+          id: Number(item.id),
+          title: item.title,
+          category: item.category,
+          caption: item.caption,
+          gradient,
+          aspectRatio,
+          icon: Icon,
+          mediaUrl: item.mediaUrl,
+        };
+      })
+    : staticMediaItems;
 
   const filtered =
     activeCategory === "All"
-      ? mediaItems
-      : mediaItems.filter((item) => item.category === activeCategory);
+      ? allItems
+      : allItems.filter((item) => item.category === activeCategory);
 
   return (
     <div
@@ -255,99 +364,130 @@ export default function MediaPage() {
           })}
         </div>
 
+        {/* Loading state */}
+        {isLoading && (
+          <div
+            data-ocid="media.loading_state"
+            className="flex items-center justify-center py-20 gap-3"
+          >
+            <Loader2
+              className="w-5 h-5 animate-spin"
+              style={{ color: "#a855f7" }}
+            />
+            <span
+              className="font-mono-code text-sm"
+              style={{ color: "rgba(168,85,247,0.5)" }}
+            >
+              LOADING_MEDIA_VAULT...
+            </span>
+          </div>
+        )}
+
         {/* Gallery grid */}
-        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-0">
-          {filtered.map((item) => {
-            const Icon = item.icon;
-            const catCfg = categoryConfig[item.category];
-            const heights: Record<string, string> = {
-              tall: "260px",
-              wide: "180px",
-              square: "220px",
-            };
+        {!isLoading && (
+          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-0">
+            {filtered.map((item, idx) => {
+              const Icon = item.icon;
+              const catCfg =
+                categoryConfig[item.category] ?? categoryConfig.All;
+              const height =
+                aspectHeights[item.aspectRatio] ?? aspectHeights.square;
 
-            return (
-              <div
-                key={item.id}
-                data-ocid={`media.item.${item.id}`}
-                className="media-card rounded-lg overflow-hidden mb-4 break-inside-avoid relative cursor-pointer"
-                style={{ height: heights[item.aspectRatio] }}
-              >
-                {/* Background gradient */}
+              return (
                 <div
-                  className="media-inner absolute inset-0"
-                  style={{ background: item.gradient }}
-                />
+                  key={item.id}
+                  data-ocid={`media.item.${idx + 1}`}
+                  className="media-card rounded-lg overflow-hidden mb-4 break-inside-avoid relative cursor-pointer"
+                  style={{ height }}
+                >
+                  {/* Background: real image or gradient */}
+                  {item.mediaUrl && item.mediaUrl !== "" ? (
+                    <img
+                      src={item.mediaUrl}
+                      alt={item.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  ) : (
+                    <>
+                      {/* Background gradient */}
+                      <div
+                        className="media-inner absolute inset-0"
+                        style={{ background: item.gradient }}
+                      />
+                      {/* Grid texture overlay */}
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          backgroundImage:
+                            "linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px)",
+                          backgroundSize: "30px 30px",
+                        }}
+                      />
+                      {/* Icon center */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div
+                          className="w-12 h-12 rounded-full flex items-center justify-center"
+                          style={{
+                            background: `${catCfg.color}15`,
+                            border: `1px solid ${catCfg.color}30`,
+                          }}
+                        >
+                          <Icon
+                            className="w-5 h-5"
+                            style={{ color: catCfg.color, opacity: 0.6 }}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
 
-                {/* Grid texture overlay */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    backgroundImage:
-                      "linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px)",
-                    backgroundSize: "30px 30px",
-                  }}
-                />
+                  {/* Category badge */}
+                  <div className="absolute top-3 left-3">
+                    <span
+                      className="font-mono-code text-xs px-2 py-1 rounded"
+                      style={{
+                        background: `${catCfg.color}18`,
+                        border: `1px solid ${catCfg.color}35`,
+                        color: catCfg.color,
+                      }}
+                    >
+                      {item.category.split(" ")[0].toUpperCase()}
+                    </span>
+                  </div>
 
-                {/* Icon center */}
-                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Glass overlay on hover */}
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center"
+                    className="media-overlay absolute inset-0 flex flex-col justify-end p-4"
                     style={{
-                      background: `${catCfg.color}15`,
-                      border: `1px solid ${catCfg.color}30`,
+                      background:
+                        "linear-gradient(180deg, transparent 30%, rgba(6,11,24,0.92) 100%)",
+                      backdropFilter: "blur(4px)",
                     }}
                   >
-                    <Icon
-                      className="w-5 h-5"
-                      style={{ color: catCfg.color, opacity: 0.6 }}
-                    />
+                    <h3
+                      className="font-display font-bold text-sm"
+                      style={{ color: "#e8f4f8" }}
+                    >
+                      {item.title}
+                    </h3>
+                    <p
+                      className="font-body text-xs mt-1"
+                      style={{ color: "rgba(232,244,248,0.6)" }}
+                    >
+                      {item.caption}
+                    </p>
                   </div>
                 </div>
+              );
+            })}
+          </div>
+        )}
 
-                {/* Category badge */}
-                <div className="absolute top-3 left-3">
-                  <span
-                    className="font-mono-code text-xs px-2 py-1 rounded"
-                    style={{
-                      background: `${catCfg.color}18`,
-                      border: `1px solid ${catCfg.color}35`,
-                      color: catCfg.color,
-                    }}
-                  >
-                    {item.category.split(" ")[0].toUpperCase()}
-                  </span>
-                </div>
-
-                {/* Glass overlay on hover */}
-                <div
-                  className="media-overlay absolute inset-0 flex flex-col justify-end p-4"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, transparent 30%, rgba(6,11,24,0.92) 100%)",
-                    backdropFilter: "blur(4px)",
-                  }}
-                >
-                  <h3
-                    className="font-display font-bold text-sm"
-                    style={{ color: "#e8f4f8" }}
-                  >
-                    {item.title}
-                  </h3>
-                  <p
-                    className="font-body text-xs mt-1"
-                    style={{ color: "rgba(232,244,248,0.6)" }}
-                  >
-                    {item.caption}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {filtered.length === 0 && (
-          <div className="text-center py-20 glass-card rounded-lg">
+        {!isLoading && filtered.length === 0 && (
+          <div
+            data-ocid="media.empty_state"
+            className="text-center py-20 glass-card rounded-lg"
+          >
             <p
               className="font-mono-code text-sm"
               style={{ color: "rgba(0,212,255,0.4)" }}

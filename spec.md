@@ -1,45 +1,39 @@
 # Harsh Gugale Portfolio
 
 ## Current State
-- Full-stack portfolio with Motoko backend and React frontend
-- Admin panel at `/admin` with tabs: Resume Editor, Blog Manager, Projects Manager
-- GA4 tracking via `analytics.ts` for resume downloads, blog clicks, project clicks, contact submits
-- Backend tracks: contacts, blog posts, projects, resume content
-- No in-app analytics counters (visitor count, view counts, resume download count)
+- Full portfolio site with Home, Blog, Media, and Admin pages
+- Admin has tabs: Resume, Blog, Projects, Analytics, Experience, Skills, Profile, Messages, Security
+- Backend has full CRUD for: blogs, projects, experiences, skills, resume content, profile meta, contacts, analytics
+- Hero tagline is **hardcoded** as static text — not reading from backend `resumeContent.tagline`
+- Experience section uses fallback hardcoded data when backend is empty; the `initializeData()` call from admin may not have been triggered
+- MediaPage is fully static (12 hardcoded items with gradient placeholders, no images)
+- No media management in admin — admin cannot add/edit/delete media items
 
 ## Requested Changes (Diff)
 
 ### Add
-- **Analytics backend storage**: new Motoko state for tracking:
-  - `visitorCount`: incremented on each page visit (via a `recordVisit` update call)
-  - `resumeDownloadCount`: incremented when resume is downloaded
-  - `blogViewCounts`: Map<Nat, Nat> (blog post id -> view count)
-  - `projectViewCounts`: Map<Nat, Nat> (project id -> view count)
-- **Backend query methods**: `getAnalytics()` returning all stats in one call
-- **Backend update methods**: `recordVisit()`, `recordResumeDownload()`, `recordBlogView(id)`, `recordProjectView(id)`
-- **Analytics tab** in admin dashboard: new "Analytics" tab showing:
-  - Total visitor count card
-  - Resume download count card
-  - Top 5 most viewed blog posts list
-  - Top 5 most viewed projects list
-- **Frontend tracking calls**: wire `recordVisit()` in App.tsx on mount, `recordResumeDownload()` in hero CTA, `recordBlogView()` on blog card click, `recordProjectView()` on project card click
+- Backend: `MediaItem` type with fields: id, title, category, caption, mediaUrl (link to image/video), mediaType (Photo/Reel/Drone/Vlog), order
+- Backend: CRUD for media items: `getAllMediaItems`, `addMediaItem`, `updateMediaItem`, `deleteMediaItem`, `initializeMediaItems`
+- Admin tab: "Media" — lets admin add/edit/delete media items with URL, title, category, caption
+- Media page now reads from backend (with static fallback for empty state)
 
 ### Modify
-- `main.mo`: add analytics state variables and methods
-- `backend.d.ts`: add new analytics types and method signatures
-- `AdminPage.tsx`: add "Analytics" tab with dashboard panel
-- `useQueries.ts`: add hooks for analytics data fetch and mutations
-- `App.tsx` or `HomePage.tsx`: call `recordVisit` on mount
+- HeroSection: read tagline from `resumeContent.tagline` (with static fallback) so admin can edit it from Resume tab
+- ExperienceSection: remove stale fallback logic — call `initializeData()` on first load via `useInitializeData` hook to ensure seeding happens, show skeleton while loading
+- `useQueries.ts`: add `useInitializeData` hook for the combined init, add media CRUD hooks
+- Admin panel: add Media tab between Profile and Messages tabs
+- Resume tab in admin: clarify the "TAGLINE" field note — it controls the hero's role text
 
 ### Remove
-- Nothing removed
+- Static hardcoded `FALLBACK_EXPERIENCES` array dependency when backend is initialized — keep as safety fallback but only show after a proper loading state
 
 ## Implementation Plan
-1. Update `main.mo` to add analytics counters (visitorCount, resumeDownloadCount, blogViewCounts, projectViewCounts), plus 4 update methods and 1 combined query `getAnalytics()`
-2. Update `backend.d.ts` with `AnalyticsData` type and new method signatures
-3. Add `useGetAnalytics`, `useRecordVisit`, `useRecordResumeDownload`, `useRecordBlogView`, `useRecordProjectView` hooks in `useQueries.ts`
-4. Wire `recordVisit` call in `App.tsx` once on mount
-5. Wire `recordResumeDownload` in hero Download Resume button
-6. Wire `recordBlogView` on blog card/read-more click in `BlogPage.tsx`
-7. Wire `recordProjectView` on project card view in `HomePage.tsx`
-8. Add "Analytics" tab to `AdminPage.tsx` with 4 stat cards and ranked lists
+1. Update `main.mo` backend to add `MediaItem` type + full CRUD + `initializeMediaItems` + combined `initializeData` call
+2. Regenerate `backend.d.ts` with new types/methods
+3. Add `useInitializeData`, `useGetAllMediaItems`, `useAddMediaItem`, `useUpdateMediaItem`, `useDeleteMediaItem` hooks to `useQueries.ts`
+4. Fix `HeroSection.tsx`: replace hardcoded tagline with `resumeContent?.tagline || "Embedded Systems Engineer | Edge AI Developer | Creative Technologist"`
+5. Fix `ExperienceSection.tsx`: call `initializeData` (combined init) on mount instead of just `initializeExperiences`, improve loading state, remove fallback after loading completes
+6. Update `MediaPage.tsx`: fetch media items from backend, render real URLs when available, fallback to gradient placeholders when no URL set
+7. Add `MediaTab` component to `AdminPage.tsx` with add/edit/delete UI
+8. Add "media" to `AdminTab` type and tab navigation
+9. Validate and deploy

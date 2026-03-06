@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import { SiGithub, SiInstagram, SiLinkedin } from "react-icons/si";
 import {
+  useGetProfileMeta,
   useGetResumeContent,
   useRecordResumeDownload,
 } from "../../hooks/useQueries";
@@ -8,6 +9,7 @@ import { trackResumeDownload } from "../../utils/analytics";
 
 export default function HeroSection() {
   const { data: resumeContent } = useGetResumeContent();
+  const { data: profileMeta } = useGetProfileMeta();
   const { mutate: recordResumeDownload } = useRecordResumeDownload();
   const resumeUrl =
     resumeContent?.resumeFileUrl && resumeContent.resumeFileUrl !== ""
@@ -125,8 +127,9 @@ export default function HeroSection() {
             textShadow: "0 0 10px rgba(0,212,255,0.4)",
           }}
         >
-          Embedded Systems Engineer&nbsp;|&nbsp;Edge AI
-          Developer&nbsp;|&nbsp;Creative Technologist
+          {resumeContent?.tagline && resumeContent.tagline !== ""
+            ? resumeContent.tagline
+            : "Embedded Systems Engineer\u00a0|\u00a0Edge AI Developer\u00a0|\u00a0Creative Technologist"}
         </p>
 
         {/* Divider line */}
@@ -198,8 +201,11 @@ export default function HeroSection() {
                 textShadow: "0 0 8px rgba(0,255,136,0.3)",
               }}
             >
-              CURRENTLY BUILDING: AI-Powered Robotic System with Mobile Vision
-              Integration
+              CURRENTLY BUILDING:{" "}
+              {profileMeta?.currentlyBuilding &&
+              profileMeta.currentlyBuilding !== ""
+                ? profileMeta.currentlyBuilding
+                : "AI-Powered Robotic System with Mobile Vision Integration"}
             </span>
           </div>
         </div>
@@ -215,7 +221,11 @@ export default function HeroSection() {
             <SiLinkedin className="w-5 h-5" />
           </SocialLink>
           <SocialLink
-            href="https://instagram.com/harshgugale"
+            href={
+              profileMeta?.instagram && profileMeta.instagram !== ""
+                ? profileMeta.instagram
+                : "https://instagram.com/harshgugale"
+            }
             label="Creative Work"
             color="#a855f7"
             ocid="hero.instagram_link"

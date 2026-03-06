@@ -14,6 +14,25 @@ export const ContactSubmission = IDL.Record({
   'message' : IDL.Text,
   'timestamp' : IDL.Int,
 });
+export const Experience = IDL.Record({
+  'id' : IDL.Nat,
+  'title' : IDL.Text,
+  'date' : IDL.Text,
+  'tags' : IDL.Vec(IDL.Text),
+  'description' : IDL.Text,
+  'accentColor' : IDL.Text,
+  'company' : IDL.Text,
+  'badge' : IDL.Text,
+});
+export const MediaItem = IDL.Record({
+  'id' : IDL.Nat,
+  'title' : IDL.Text,
+  'itemOrder' : IDL.Nat,
+  'mediaUrl' : IDL.Text,
+  'caption' : IDL.Text,
+  'mediaType' : IDL.Text,
+  'category' : IDL.Text,
+});
 export const BlogPost = IDL.Record({
   'id' : IDL.Nat,
   'title' : IDL.Text,
@@ -50,6 +69,11 @@ export const AnalyticsData = IDL.Record({
   'visitorCount' : IDL.Nat,
   'resumeDownloadCount' : IDL.Nat,
 });
+export const ProfileMeta = IDL.Record({
+  'instagram' : IDL.Text,
+  'currentlyBuilding' : IDL.Text,
+  'profileImageUrl' : IDL.Text,
+});
 export const ResumeContent = IDL.Record({
   'linkedin' : IDL.Text,
   'about' : IDL.Text,
@@ -59,6 +83,13 @@ export const ResumeContent = IDL.Record({
   'careerObjective' : IDL.Text,
   'github' : IDL.Text,
   'resumeFileUrl' : IDL.Text,
+});
+export const Skill = IDL.Record({ 'name' : IDL.Text, 'level' : IDL.Nat });
+export const SkillCategory = IDL.Record({
+  'id' : IDL.Nat,
+  'name' : IDL.Text,
+  'accentColor' : IDL.Text,
+  'skills' : IDL.Vec(Skill),
 });
 
 export const idlService = IDL.Service({
@@ -76,23 +107,51 @@ export const idlService = IDL.Service({
       [IDL.Nat],
       [],
     ),
+  'addExperience' : IDL.Func(
+      [
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Vec(IDL.Text),
+        IDL.Text,
+      ],
+      [IDL.Nat],
+      [],
+    ),
+  'addMediaItem' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
+      [IDL.Nat],
+      [],
+    ),
   'addProject' : IDL.Func(
       [IDL.Text, IDL.Vec(IDL.Text), IDL.Text, IDL.Text, IDL.Text, IDL.Text],
       [IDL.Nat],
       [],
     ),
+  'changeAdminPassword' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
   'deleteBlogPost' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+  'deleteExperience' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+  'deleteMediaItem' : IDL.Func([IDL.Nat], [IDL.Bool], []),
   'deleteProject' : IDL.Func([IDL.Nat], [IDL.Bool], []),
   'getAllContacts' : IDL.Func([], [IDL.Vec(ContactSubmission)], ['query']),
+  'getAllExperiences' : IDL.Func([], [IDL.Vec(Experience)], ['query']),
+  'getAllMediaItems' : IDL.Func([], [IDL.Vec(MediaItem)], ['query']),
   'getAllPosts' : IDL.Func([], [IDL.Vec(BlogPost)], ['query']),
   'getAllProjects' : IDL.Func([], [IDL.Vec(Project)], ['query']),
   'getAnalytics' : IDL.Func([], [AnalyticsData], ['query']),
   'getFeaturedPost' : IDL.Func([], [IDL.Opt(BlogPost)], ['query']),
   'getPostsByCategory' : IDL.Func([IDL.Text], [IDL.Vec(BlogPost)], ['query']),
+  'getProfileMeta' : IDL.Func([], [ProfileMeta], ['query']),
   'getResumeContent' : IDL.Func([], [ResumeContent], ['query']),
+  'getSkillCategories' : IDL.Func([], [IDL.Vec(SkillCategory)], ['query']),
   'initializeBlogs' : IDL.Func([], [], []),
   'initializeData' : IDL.Func([], [], []),
+  'initializeExperiences' : IDL.Func([], [], []),
+  'initializeMediaItems' : IDL.Func([], [], []),
   'initializeProjects' : IDL.Func([], [], []),
+  'initializeSkills' : IDL.Func([], [], []),
   'recordBlogView' : IDL.Func([IDL.Nat], [], []),
   'recordProjectView' : IDL.Func([IDL.Nat], [], []),
   'recordResumeDownload' : IDL.Func([], [], []),
@@ -113,6 +172,26 @@ export const idlService = IDL.Service({
       [IDL.Bool],
       [],
     ),
+  'updateExperience' : IDL.Func(
+      [
+        IDL.Nat,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Vec(IDL.Text),
+        IDL.Text,
+      ],
+      [IDL.Bool],
+      [],
+    ),
+  'updateMediaItem' : IDL.Func(
+      [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
+      [IDL.Bool],
+      [],
+    ),
+  'updateProfileMeta' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
   'updateProject' : IDL.Func(
       [
         IDL.Nat,
@@ -140,6 +219,12 @@ export const idlService = IDL.Service({
       [],
       [],
     ),
+  'updateSkillCategory' : IDL.Func(
+      [IDL.Nat, IDL.Text, IDL.Text, IDL.Vec(Skill)],
+      [IDL.Bool],
+      [],
+    ),
+  'verifyAdminPassword' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
 });
 
 export const idlInitArgs = [];
@@ -150,6 +235,25 @@ export const idlFactory = ({ IDL }) => {
     'email' : IDL.Text,
     'message' : IDL.Text,
     'timestamp' : IDL.Int,
+  });
+  const Experience = IDL.Record({
+    'id' : IDL.Nat,
+    'title' : IDL.Text,
+    'date' : IDL.Text,
+    'tags' : IDL.Vec(IDL.Text),
+    'description' : IDL.Text,
+    'accentColor' : IDL.Text,
+    'company' : IDL.Text,
+    'badge' : IDL.Text,
+  });
+  const MediaItem = IDL.Record({
+    'id' : IDL.Nat,
+    'title' : IDL.Text,
+    'itemOrder' : IDL.Nat,
+    'mediaUrl' : IDL.Text,
+    'caption' : IDL.Text,
+    'mediaType' : IDL.Text,
+    'category' : IDL.Text,
   });
   const BlogPost = IDL.Record({
     'id' : IDL.Nat,
@@ -187,6 +291,11 @@ export const idlFactory = ({ IDL }) => {
     'visitorCount' : IDL.Nat,
     'resumeDownloadCount' : IDL.Nat,
   });
+  const ProfileMeta = IDL.Record({
+    'instagram' : IDL.Text,
+    'currentlyBuilding' : IDL.Text,
+    'profileImageUrl' : IDL.Text,
+  });
   const ResumeContent = IDL.Record({
     'linkedin' : IDL.Text,
     'about' : IDL.Text,
@@ -196,6 +305,13 @@ export const idlFactory = ({ IDL }) => {
     'careerObjective' : IDL.Text,
     'github' : IDL.Text,
     'resumeFileUrl' : IDL.Text,
+  });
+  const Skill = IDL.Record({ 'name' : IDL.Text, 'level' : IDL.Nat });
+  const SkillCategory = IDL.Record({
+    'id' : IDL.Nat,
+    'name' : IDL.Text,
+    'accentColor' : IDL.Text,
+    'skills' : IDL.Vec(Skill),
   });
   
   return IDL.Service({
@@ -213,23 +329,51 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         [],
       ),
+    'addExperience' : IDL.Func(
+        [
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Vec(IDL.Text),
+          IDL.Text,
+        ],
+        [IDL.Nat],
+        [],
+      ),
+    'addMediaItem' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
+        [IDL.Nat],
+        [],
+      ),
     'addProject' : IDL.Func(
         [IDL.Text, IDL.Vec(IDL.Text), IDL.Text, IDL.Text, IDL.Text, IDL.Text],
         [IDL.Nat],
         [],
       ),
+    'changeAdminPassword' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
     'deleteBlogPost' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+    'deleteExperience' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+    'deleteMediaItem' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'deleteProject' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'getAllContacts' : IDL.Func([], [IDL.Vec(ContactSubmission)], ['query']),
+    'getAllExperiences' : IDL.Func([], [IDL.Vec(Experience)], ['query']),
+    'getAllMediaItems' : IDL.Func([], [IDL.Vec(MediaItem)], ['query']),
     'getAllPosts' : IDL.Func([], [IDL.Vec(BlogPost)], ['query']),
     'getAllProjects' : IDL.Func([], [IDL.Vec(Project)], ['query']),
     'getAnalytics' : IDL.Func([], [AnalyticsData], ['query']),
     'getFeaturedPost' : IDL.Func([], [IDL.Opt(BlogPost)], ['query']),
     'getPostsByCategory' : IDL.Func([IDL.Text], [IDL.Vec(BlogPost)], ['query']),
+    'getProfileMeta' : IDL.Func([], [ProfileMeta], ['query']),
     'getResumeContent' : IDL.Func([], [ResumeContent], ['query']),
+    'getSkillCategories' : IDL.Func([], [IDL.Vec(SkillCategory)], ['query']),
     'initializeBlogs' : IDL.Func([], [], []),
     'initializeData' : IDL.Func([], [], []),
+    'initializeExperiences' : IDL.Func([], [], []),
+    'initializeMediaItems' : IDL.Func([], [], []),
     'initializeProjects' : IDL.Func([], [], []),
+    'initializeSkills' : IDL.Func([], [], []),
     'recordBlogView' : IDL.Func([IDL.Nat], [], []),
     'recordProjectView' : IDL.Func([IDL.Nat], [], []),
     'recordResumeDownload' : IDL.Func([], [], []),
@@ -250,6 +394,26 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Bool],
         [],
       ),
+    'updateExperience' : IDL.Func(
+        [
+          IDL.Nat,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Vec(IDL.Text),
+          IDL.Text,
+        ],
+        [IDL.Bool],
+        [],
+      ),
+    'updateMediaItem' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
+        [IDL.Bool],
+        [],
+      ),
+    'updateProfileMeta' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
     'updateProject' : IDL.Func(
         [
           IDL.Nat,
@@ -277,6 +441,12 @@ export const idlFactory = ({ IDL }) => {
         [],
         [],
       ),
+    'updateSkillCategory' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Vec(Skill)],
+        [IDL.Bool],
+        [],
+      ),
+    'verifyAdminPassword' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
   });
 };
 

@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { Suspense, lazy, useEffect } from "react";
 import Footer from "./components/Footer";
+import FuturisticBackground from "./components/FuturisticBackground";
 import Navbar from "./components/Navbar";
 import { useRecordVisit } from "./hooks/useQueries";
 // HomePage is above-the-fold — load eagerly
@@ -55,6 +56,7 @@ function RootLayout() {
       className="min-h-screen"
       style={{ backgroundColor: "#060b18", color: "#e8f4f8" }}
     >
+      <FuturisticBackground />
       <Navbar />
       <main>
         <Suspense fallback={<PageLoader />}>

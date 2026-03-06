@@ -2,8 +2,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   AnalyticsData,
   BlogPost,
+  ContactSubmission,
+  Experience,
+  MediaItem,
+  ProfileMeta,
   Project,
   ResumeContent,
+  Skill,
+  SkillCategory,
 } from "../backend.d";
 import { useActor } from "./useActor";
 
@@ -350,6 +356,221 @@ export function useInitializeBlogs() {
   });
 }
 
+// ── Experiences ───────────────────────────────────────────────────────
+export function useGetAllExperiences() {
+  const { actor, isFetching } = useActor();
+  return useQuery<Experience[]>({
+    queryKey: ["experiences"],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllExperiences();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useAddExperience() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      title: string;
+      company: string;
+      badge: string;
+      date: string;
+      description: string;
+      tags: string[];
+      accentColor: string;
+    }) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.addExperience(
+        data.title,
+        data.company,
+        data.badge,
+        data.date,
+        data.description,
+        data.tags,
+        data.accentColor,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["experiences"] });
+    },
+  });
+}
+
+export function useUpdateExperience() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      id: bigint;
+      title: string;
+      company: string;
+      badge: string;
+      date: string;
+      description: string;
+      tags: string[];
+      accentColor: string;
+    }) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.updateExperience(
+        data.id,
+        data.title,
+        data.company,
+        data.badge,
+        data.date,
+        data.description,
+        data.tags,
+        data.accentColor,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["experiences"] });
+    },
+  });
+}
+
+export function useDeleteExperience() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: bigint) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.deleteExperience(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["experiences"] });
+    },
+  });
+}
+
+export function useInitializeExperiences() {
+  const { actor } = useActor();
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.initializeExperiences();
+    },
+  });
+}
+
+// ── Skill Categories ──────────────────────────────────────────────────
+export function useGetSkillCategories() {
+  const { actor, isFetching } = useActor();
+  return useQuery<SkillCategory[]>({
+    queryKey: ["skillCategories"],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getSkillCategories();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useUpdateSkillCategory() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      id: bigint;
+      name: string;
+      accentColor: string;
+      skills: Skill[];
+    }) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.updateSkillCategory(
+        data.id,
+        data.name,
+        data.accentColor,
+        data.skills,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["skillCategories"] });
+    },
+  });
+}
+
+export function useInitializeSkills() {
+  const { actor } = useActor();
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.initializeSkills();
+    },
+  });
+}
+
+// ── Profile Meta ──────────────────────────────────────────────────────
+export function useGetProfileMeta() {
+  const { actor, isFetching } = useActor();
+  return useQuery<ProfileMeta>({
+    queryKey: ["profileMeta"],
+    queryFn: async () => {
+      if (!actor)
+        return { instagram: "", currentlyBuilding: "", profileImageUrl: "" };
+      return actor.getProfileMeta();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useUpdateProfileMeta() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: ProfileMeta) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.updateProfileMeta(
+        data.profileImageUrl,
+        data.instagram,
+        data.currentlyBuilding,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profileMeta"] });
+    },
+  });
+}
+
+// ── Admin Password ────────────────────────────────────────────────────
+export function useChangeAdminPassword() {
+  const { actor } = useActor();
+  return useMutation({
+    mutationFn: async (data: {
+      currentPassword: string;
+      newPassword: string;
+    }) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.changeAdminPassword(data.currentPassword, data.newPassword);
+    },
+  });
+}
+
+export function useVerifyAdminPassword() {
+  const { actor } = useActor();
+  return useMutation({
+    mutationFn: async (password: string) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.verifyAdminPassword(password);
+    },
+  });
+}
+
+// ── Contact Messages ──────────────────────────────────────────────────
+export function useGetAllContacts() {
+  const { actor, isFetching } = useActor();
+  return useQuery<ContactSubmission[]>({
+    queryKey: ["contacts"],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllContacts();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
 // ── Contact Submission ────────────────────────────────────────────────
 export function useSubmitContact() {
   const { actor } = useActor();
@@ -371,6 +592,112 @@ export function useSubmitContact() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
+    },
+  });
+}
+
+// ── Initialize All Data ───────────────────────────────────────────────
+export function useInitializeData() {
+  const { actor } = useActor();
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.initializeData();
+    },
+  });
+}
+
+// ── Media Items ────────────────────────────────────────────────────────
+export function useGetAllMediaItems() {
+  const { actor, isFetching } = useActor();
+  return useQuery<MediaItem[]>({
+    queryKey: ["mediaItems"],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllMediaItems();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useAddMediaItem() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      title: string;
+      category: string;
+      caption: string;
+      mediaUrl: string;
+      mediaType: string;
+      itemOrder: bigint;
+    }) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.addMediaItem(
+        data.title,
+        data.category,
+        data.caption,
+        data.mediaUrl,
+        data.mediaType,
+        data.itemOrder,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["mediaItems"] });
+    },
+  });
+}
+
+export function useUpdateMediaItem() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      id: bigint;
+      title: string;
+      category: string;
+      caption: string;
+      mediaUrl: string;
+      mediaType: string;
+      itemOrder: bigint;
+    }) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.updateMediaItem(
+        data.id,
+        data.title,
+        data.category,
+        data.caption,
+        data.mediaUrl,
+        data.mediaType,
+        data.itemOrder,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["mediaItems"] });
+    },
+  });
+}
+
+export function useDeleteMediaItem() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: bigint) => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.deleteMediaItem(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["mediaItems"] });
+    },
+  });
+}
+
+export function useInitializeMediaItems() {
+  const { actor } = useActor();
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error("Actor not initialized");
+      return actor.initializeMediaItems();
     },
   });
 }
